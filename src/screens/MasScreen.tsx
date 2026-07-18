@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import {
   Tag, Store, CircleDollarSign, Cloud, Upload,
-  FolderOpen, Palette, Bell, User, ChevronRight,
+  FolderOpen, Palette, Bell, User, ChevronRight, ArrowLeft, ArrowLeftRight,
 } from 'lucide-react-native';
 import { colors, primaryGradient } from '../theme/colors';
 
@@ -45,13 +46,18 @@ function MenuItem({ Icon, label, description, accentColor, onPress, disabled }: 
 }
 
 export function MasScreen() {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.root}>
       <SafeAreaView style={{ flex: 1 }} edges={['top']}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
           <View style={styles.header}>
-            <Text style={styles.title}>Más</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={8}>
+              <ArrowLeft size={18} color={colors.textSecondary} strokeWidth={2.2} />
+            </TouchableOpacity>
+            <Text style={styles.title}>Configuración</Text>
           </View>
 
           {/* Perfil */}
@@ -64,6 +70,17 @@ export function MasScreen() {
               <Text style={styles.profileBiz}>3Dev · Impresiones 3D</Text>
             </View>
           </LinearGradient>
+
+          <Text style={styles.sectionLabel}>Registros</Text>
+          <View style={styles.menuCard}>
+            <MenuItem
+              Icon={ArrowLeftRight}
+              label="Movimientos"
+              description="Todos tus ingresos y gastos"
+              accentColor={colors.income}
+              onPress={() => navigation.navigate('Movimientos')}
+            />
+          </View>
 
           <Text style={styles.sectionLabel}>Mi negocio</Text>
           <View style={styles.menuCard}>
@@ -96,7 +113,16 @@ export function MasScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   scroll: { paddingBottom: 130 },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 },
+  header: {
+    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20,
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+  },
+  backBtn: {
+    width: 34, height: 34, borderRadius: 12,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: colors.border,
+  },
   title: { fontSize: 26, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
   profileCard: {
     marginHorizontal: 20, marginBottom: 28, borderRadius: 24, padding: 20,

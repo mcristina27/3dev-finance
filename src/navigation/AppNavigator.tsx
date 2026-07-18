@@ -4,15 +4,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, ArrowLeftRight, Package, CalendarDays, MoreHorizontal, Plus } from 'lucide-react-native';
+import { Home, ShoppingBag, Package, CalendarDays, Plus } from 'lucide-react-native';
 import { HomeScreen } from '../screens/HomeScreen';
 import { MovimientosScreen } from '../screens/MovimientosScreen';
 import { InsumosScreen } from '../screens/InsumosScreen';
+import { PedidosScreen } from '../screens/PedidosScreen';
 import { AgendaScreen } from '../screens/AgendaScreen';
 import { MasScreen } from '../screens/MasScreen';
 import { NewTransactionScreen } from '../screens/NewTransactionScreen';
 import { NewMaterialScreen } from '../screens/NewMaterialScreen';
 import { NewActivityScreen } from '../screens/NewActivityScreen';
+import { NewAgendaEventScreen } from '../screens/NewAgendaEventScreen';
+import { AdjustStockScreen } from '../screens/AdjustStockScreen';
 import { colors, pastel } from '../theme/colors';
 
 const Tab = createBottomTabNavigator();
@@ -20,18 +23,18 @@ const Stack = createNativeStackNavigator();
 
 type LucideIcon = React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 
-// Cada tab tiene su propio color pastel
+// Cada tab tiene su propio color pastel — 4 tabs principales, sin Movimientos/Más
+// (esos viven dentro de Configuración, accesible desde Inicio).
 const TAB_CONFIG: Record<string, {
   Icon: LucideIcon;
   label: string;
   color: string;
   bgColor: string;
 }> = {
-  Inicio:      { Icon: Home,           label: 'Inicio',      color: pastel.lilac,      bgColor: pastel.lilacLight },
-  Movimientos: { Icon: ArrowLeftRight, label: 'Movimientos', color: pastel.blue,       bgColor: pastel.blueLight },
-  Insumos:     { Icon: Package,        label: 'Insumos',     color: pastel.pistachioDark, bgColor: pastel.pistachioLight },
-  Agenda:      { Icon: CalendarDays,   label: 'Agenda',      color: pastel.yellowDark, bgColor: pastel.yellowLight },
-  Mas:         { Icon: MoreHorizontal, label: 'Más',         color: pastel.berry,      bgColor: pastel.berryLight },
+  Inicio:   { Icon: Home,         label: 'Inicio',     color: pastel.lilac,         bgColor: pastel.lilacLight },
+  Pedidos:  { Icon: ShoppingBag,  label: 'Pedidos',    color: pastel.blueDark,      bgColor: pastel.blueLight },
+  Insumos:  { Icon: Package,      label: 'Inventario', color: pastel.pistachioDark, bgColor: pastel.pistachioLight },
+  Agenda:   { Icon: CalendarDays, label: 'Agenda',     color: pastel.yellowDark,    bgColor: pastel.yellowLight },
 };
 
 // ─── FAB gradient: Dusty Berry ───────────────────────────────────────────────
@@ -77,10 +80,10 @@ function PillTabBar(props: any) {
 
   return (
     <View style={styles.outerWrap} pointerEvents="box-none">
-      {/* FAB central */}
+      {/* FAB central — acceso rápido a "nuevo pedido" */}
       <View style={styles.fabWrap} pointerEvents="box-none">
         <TouchableOpacity
-          onPress={() => navigation.navigate('NuevoMovimiento')}
+          onPress={() => navigation.navigate('NuevaActividad')}
           activeOpacity={0.85}
           style={styles.fabShadow}
         >
@@ -109,11 +112,10 @@ function PillTabBar(props: any) {
 function Tabs() {
   return (
     <Tab.Navigator tabBar={p => <PillTabBar {...p} />} screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Inicio"      component={HomeScreen} />
-      <Tab.Screen name="Movimientos" component={MovimientosScreen} />
-      <Tab.Screen name="Insumos"     component={InsumosScreen} />
-      <Tab.Screen name="Agenda"      component={AgendaScreen} />
-      <Tab.Screen name="Mas"         component={MasScreen} />
+      <Tab.Screen name="Inicio"  component={HomeScreen} />
+      <Tab.Screen name="Pedidos" component={PedidosScreen} />
+      <Tab.Screen name="Insumos" component={InsumosScreen} />
+      <Tab.Screen name="Agenda"  component={AgendaScreen} />
     </Tab.Navigator>
   );
 }
@@ -123,6 +125,11 @@ export function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Main" component={Tabs} />
+
+        {/* Config y Movimientos ya no son tabs — se llega desde el engranaje en Inicio */}
+        <Stack.Screen name="Config"      component={MasScreen} />
+        <Stack.Screen name="Movimientos" component={MovimientosScreen} />
+
         <Stack.Screen
           name="NuevoMovimiento"
           component={NewTransactionScreen}
@@ -136,6 +143,16 @@ export function AppNavigator() {
         <Stack.Screen
           name="NuevaActividad"
           component={NewActivityScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="NuevoEvento"
+          component={NewAgendaEventScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="AjustarStock"
+          component={AdjustStockScreen}
           options={{ presentation: 'modal' }}
         />
       </Stack.Navigator>

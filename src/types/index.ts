@@ -1,6 +1,9 @@
 // ─── Movimientos (ingresos / gastos) ────────────────────────────────────────
 
-export type EntryType = 'income' | 'expense';
+export type EntryType = "income" | "expense";
+
+/** Estado de cobro de un ingreso. Sin definir = se asume 'paid' (compatibilidad con registros viejos). */
+export type PaymentStatus = "paid" | "pending";
 
 export interface Entry {
   id: string;
@@ -12,6 +15,10 @@ export interface Entry {
   photos?: string[];
   category?: string;
   channel?: string; // feria, online, pedido directo, etc.
+  /** Solo relevante para ingresos generados desde un pedido/evento. Sin definir = pagado. */
+  paymentStatus?: PaymentStatus;
+  /** Id de la Activity (pedido/evento) que generó este ingreso, si aplica. */
+  sourceActivityId?: string;
   createdAt: string;
 }
 
@@ -21,7 +28,15 @@ export type TransactionType = EntryType;
 
 // ─── Insumos / materiales ────────────────────────────────────────────────────
 
-export type MaterialUnit = 'g' | 'kg' | 'ml' | 'l' | 'unidad' | 'metro' | 'cm' | string;
+export type MaterialUnit =
+  | "g"
+  | "kg"
+  | "ml"
+  | "l"
+  | "unidad"
+  | "metro"
+  | "cm"
+  | string;
 
 export interface Material {
   id: string;
@@ -36,16 +51,26 @@ export interface Material {
   updatedAt: string;
 }
 
-// ─── Agenda (eventos y pedidos) ──────────────────────────────────────────────
+// ─── Pedidos (pedidos individuales y ventas registradas en eventos) ──────────
+// Nota: los EVENTOS COMO FECHA (el calendario "vamos a la feria X") viven en
+// AgendaEvent, más abajo. Una Activity es una VENTA (individual o de evento)
+// que genera ingreso y descuenta stock — no es una fecha en el calendario.
 
-export type ActivityType = 'event' | 'order' | 'custom';
-export type ActivityStatus = 'pending' | 'confirmed' | 'in_progress' | 'done' | 'cancelled';
+export type ActivityType = "order" | "event_sale" | "custom";
+export type ActivityStatus =
+  | "pending"
+  | "confirmed"
+  | "in_progress"
+  | "done"
+  | "cancelled";
 
 export interface ActivityItem {
   productId?: string;
   name: string;
   qty: number;
   unitPrice: number;
+  /** Solo ventas de evento: cuántas unidades de este ítem se vendieron realmente (qty = cuántas llevaste). */
+  qtySold?: number;
 }
 
 export interface Activity {
@@ -58,7 +83,28 @@ export interface Activity {
   totalAmount?: number;
   notes?: string;
   channel?: string;
+  /** Solo type 'event_sale': a qué AgendaEvent (fecha del calendario) pertenece esta venta. */
+  eventId?: string;
+  /** Pagado / pendiente de cobro. Al marcarse 'paid' se genera/actualiza el Entry de ingreso. */
+  paymentStatus?: PaymentStatus;
   relatedEntryId?: string;
+  /** true = ya se descontó del stock por esta actividad (evita descontar dos veces). */
+  stockDeducted?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Agenda (calendario de eventos futuros) ──────────────────────────────────
+// Puro planeamiento: fecha, lugar, notas. NO genera ingresos ni descuenta stock.
+// Las ventas que se hacen en el evento se registran aparte, en Activity
+// (type: 'event_sale'), y pueden anclarse acá vía Activity.eventId.
+
+export interface AgendaEvent {
+  id: string;
+  title: string;
+  date: string;
+  location?: string;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -66,14 +112,40 @@ export interface Activity {
 // ─── Catálogo remoto (productos de 3devlabs.app) ─────────────────────────────
 
 export interface CatalogProduct {
-  id:       number;
-  code:     string | null;
-  name:     string;
+  id: number;
+  code: string | null;
+  name: string;
   category: string;
-  price:    number | null;
-  image:    string | null;
-  tag:      string;
-  inStock:  boolean;
+  price: number | null;
+  image: string | null;
+  tag: string;
+  inStock: boolean;
+}
+
+// ─── Stock de productos (ligado al catálogo web) ─────────────────────────────
+
+/**
+ * Cantidad en stock de un producto del catálogo. `productId` es el id del
+ * CatalogProduct (como string) — el API web solo trae inStock: boolean,
+ * no cantidades, así que el conteo real vive acá, localmente.
+ */
+export interface ProductStock {
+  productId: string;
+  qty: number;
+  updatedAt: string;
+}
+
+// ─── Recetas (insumos por producto → costo real) ─────────────────────────────
+
+export interface RecipeIngredient {
+  materialId: string;
+  qty: number; // cantidad de ese insumo que usa 1 unidad del producto
+}
+
+export interface Recipe {
+  productId: string; // id del CatalogProduct (como string)
+  ingredients: RecipeIngredient[];
+  updatedAt: string;
 }
 
 // ─── Resúmenes ───────────────────────────────────────────────────────────────

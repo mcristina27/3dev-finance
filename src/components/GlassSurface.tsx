@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
-import { BlurView, BlurTint } from 'expo-blur';
+import React from "react";
+import { View, StyleSheet, ViewStyle, StyleProp, Platform } from "react-native";
+import { BlurView, BlurTint } from "expo-blur";
 
 interface GlassSurfaceProps {
   children: React.ReactNode;
@@ -26,14 +26,16 @@ export function GlassSurface({
   children,
   style,
   intensity = 55,
-  tint = 'systemUltraThinMaterialLight',
-  overlayColor = 'rgba(255, 252, 248, 0.45)',
-  fallbackColor = 'rgba(240, 235, 227, 0.90)',
+  tint = "systemUltraThinMaterialLight",
+  overlayColor = "rgba(255, 252, 248, 0.45)",
+  fallbackColor = "rgba(240, 235, 227, 0.90)",
 }: GlassSurfaceProps) {
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === "ios") {
     return (
       <BlurView intensity={intensity} tint={tint} style={[styles.base, style]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: overlayColor }]} />
+        <View
+          style={[StyleSheet.absoluteFill, { backgroundColor: overlayColor }]}
+        />
         {children}
       </BlurView>
     );
@@ -48,6 +50,6 @@ export function GlassSurface({
 
 const styles = StyleSheet.create({
   base: {
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 });
