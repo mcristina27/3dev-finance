@@ -63,6 +63,19 @@ export interface Activity {
   updatedAt: string;
 }
 
+// ─── Catálogo remoto (productos de 3devlabs.app) ─────────────────────────────
+
+export interface CatalogProduct {
+  id:       number;
+  code:     string | null;
+  name:     string;
+  category: string;
+  price:    number | null;
+  image:    string | null;
+  tag:      string;
+  inStock:  boolean;
+}
+
 // ─── Resúmenes ───────────────────────────────────────────────────────────────
 
 export interface MonthSummary {

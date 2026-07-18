@@ -12,6 +12,7 @@ import { AgendaScreen } from '../screens/AgendaScreen';
 import { MasScreen } from '../screens/MasScreen';
 import { NewTransactionScreen } from '../screens/NewTransactionScreen';
 import { NewMaterialScreen } from '../screens/NewMaterialScreen';
+import { NewActivityScreen } from '../screens/NewActivityScreen';
 import { colors, pastel } from '../theme/colors';
 
 const Tab = createBottomTabNavigator();
@@ -130,6 +131,11 @@ export function AppNavigator() {
         <Stack.Screen
           name="NuevoInsumo"
           component={NewMaterialScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="NuevaActividad"
+          component={NewActivityScreen}
           options={{ presentation: 'modal' }}
         />
       </Stack.Navigator>

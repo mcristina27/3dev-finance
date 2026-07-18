@@ -21,7 +21,7 @@ export function HomeScreen() {
   if (loading) {
     return (
       <View style={styles.root}>
-        <ActivityIndicator size="large" color={pastel.rose} style={{ marginTop: 80 }} />
+        <ActivityIndicator size="large" color={pastel.berry} style={{ marginTop: 80 }} />
       </View>
     );
   }
