@@ -177,14 +177,6 @@ export function HomeScreen() {
 
             {recent.length === 0 ? (
               <View style={styles.emptyState}>
-                <LinearGradient
-                  colors={["#FDE68A", "#F9A8D4"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.emptyIcon}
-                >
-                  <Text style={styles.emptyEmoji}>✨</Text>
-                </LinearGradient>
                 <Text style={styles.emptyText}>¡Todo listo para empezar!</Text>
                 <Text style={styles.emptySubtext}>
                   Toca + para registrar tu primer movimiento

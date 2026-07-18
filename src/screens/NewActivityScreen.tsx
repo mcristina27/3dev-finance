@@ -27,6 +27,7 @@ import {
   WifiOff,
   CalendarDays,
   RefreshCw,
+  Lock,
 } from "lucide-react-native";
 import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
@@ -67,6 +68,7 @@ export function NewActivityScreen() {
   const { events } = useAgendaEvents();
   const existing = activityId ? getActivity(activityId) : undefined;
   const isEditing = !!existing;
+  const isLocked = existing?.stockDeducted === true;
 
   const [type, setType] = useState<ActivityType>(
     existing?.type === "event_sale" ? "event_sale" : "order",
@@ -241,11 +243,127 @@ export function NewActivityScreen() {
         await addActivity(payload);
       }
       navigation.goBack();
-    } catch {
-      Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "No se pudo guardar. Intenta de nuevo.";
+      Alert.alert("Error", message);
     } finally {
       setSaving(false);
     }
+  }
+
+  if (isLocked) {
+    const linkedEvent = eventId
+      ? sortedEvents.find((ev) => ev.id === eventId)
+      : undefined;
+
+    return (
+      <View style={styles.root}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.closeBtn}
+            >
+              <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>
+              {type === "order" ? "Pedido" : "Venta de evento"}
+            </Text>
+            <View style={{ width: 36 }} />
+          </View>
+
+          <ScrollView
+            style={styles.scroll}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.lockedBanner}>
+              <Lock size={16} color={pastel.pistachioDark} strokeWidth={2.2} />
+              <Text style={styles.lockedBannerText}>
+                Este {type === "order" ? "pedido" : "registro"} ya está
+                confirmado y pagado. Se registró como ingreso en Movimientos y
+                ya no se puede editar.
+              </Text>
+            </View>
+
+            <View style={styles.form}>
+              <View style={styles.field}>
+                <Text style={styles.label}>
+                  {type === "order" ? "Cliente / Pedido" : "Título"}
+                </Text>
+                <Text style={styles.readOnlyValue}>{title}</Text>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Fecha</Text>
+                <Text style={styles.readOnlyValue}>{formatDate(date)}</Text>
+              </View>
+
+              {type === "event_sale" && linkedEvent && (
+                <View style={styles.field}>
+                  <Text style={styles.label}>Evento</Text>
+                  <Text style={styles.readOnlyValue}>
+                    {linkedEvent.title} · {formatDate(linkedEvent.date)}
+                  </Text>
+                </View>
+              )}
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Cobro</Text>
+                <Text style={styles.readOnlyValue}>
+                  {paymentStatus === "paid" ? "Pagado" : "Pendiente de cobro"}
+                </Text>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Estado</Text>
+                <Text style={styles.readOnlyValue}>
+                  {STATUSES.find((s) => s.key === status)?.label ?? status}
+                </Text>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Productos</Text>
+                <View style={styles.itemsList}>
+                  {items.map((item, i) => (
+                    <View key={i} style={styles.itemRow}>
+                      <Text style={styles.itemName} numberOfLines={1}>
+                        {item.name}
+                      </Text>
+                      <Text style={styles.itemSubtotal}>
+                        {item.qty} × {formatCurrency(item.unitPrice)}
+                      </Text>
+                    </View>
+                  ))}
+                  <View style={styles.totalRow}>
+                    <Text style={styles.totalLabel}>Total</Text>
+                    <Text style={styles.totalValue}>
+                      {formatCurrency(orderTotal)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {!!channel && (
+                <View style={styles.field}>
+                  <Text style={styles.label}>Canal</Text>
+                  <Text style={styles.readOnlyValue}>{channel}</Text>
+                </View>
+              )}
+
+              {!!notes && (
+                <View style={styles.field}>
+                  <Text style={styles.label}>Notas</Text>
+                  <Text style={styles.readOnlyValue}>{notes}</Text>
+                </View>
+              )}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    );
   }
 
   return (
@@ -739,6 +857,36 @@ const styles = StyleSheet.create({
   typeBtnActive: { backgroundColor: pastel.blueLight },
   typeBtnText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
   typeBtnTextActive: { color: pastel.blueDark, fontWeight: "700" },
+  lockedBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: pastel.pistachioLight,
+    borderWidth: 1.5,
+    borderColor: pastel.pistachioDark,
+  },
+  lockedBannerText: {
+    flex: 1,
+    fontSize: 12.5,
+    fontWeight: "600",
+    color: pastel.pistachioDark,
+    lineHeight: 18,
+  },
+  readOnlyValue: {
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: colors.text,
+    fontWeight: "500",
+  },
   form: { paddingHorizontal: 20, gap: 16, paddingBottom: 20 },
   field: { gap: 7 },
   label: {

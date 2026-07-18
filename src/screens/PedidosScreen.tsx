@@ -16,6 +16,7 @@ import {
   Plus,
   Trash2,
   CalendarDays,
+  Lock,
 } from "lucide-react-native";
 import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
@@ -71,9 +72,14 @@ function ActivityRow({
         <Icon size={18} color={statusStyle.fg} strokeWidth={1.8} />
       </View>
       <View style={styles.rowInfo}>
-        <Text style={styles.rowName} numberOfLines={1}>
-          {activity.title}
-        </Text>
+        <View style={styles.rowNameRow}>
+          <Text style={styles.rowName} numberOfLines={1}>
+            {activity.title}
+          </Text>
+          {activity.stockDeducted && (
+            <Lock size={12} color={pastel.pistachioDark} strokeWidth={2.4} />
+          )}
+        </View>
         <Text style={styles.rowHint} numberOfLines={1}>
           {formatDate(activity.date)}
           {activity.channel ? ` · ${activity.channel}` : ""}
@@ -129,13 +135,28 @@ export function PedidosScreen() {
 
   const sorted = [...activities].sort((a, b) => b.date.localeCompare(a.date));
 
-  function handleDelete(id: string, title: string) {
-    Alert.alert("Eliminar", `¿Eliminar "${title}"?`, [
+  function handleDelete(activity: Activity) {
+    if (activity.stockDeducted) {
+      Alert.alert(
+        "Este pedido ya generó un ingreso",
+        `"${activity.title}" ya está confirmado, pagado y registrado en Movimientos. Eliminarlo NO revierte el stock descontado ni borra ese ingreso — quedaría suelto. ¿Eliminar de todas formas?`,
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Eliminar de todas formas",
+            style: "destructive",
+            onPress: () => deleteActivity(activity.id),
+          },
+        ],
+      );
+      return;
+    }
+    Alert.alert("Eliminar", `¿Eliminar "${activity.title}"?`, [
       { text: "Cancelar", style: "cancel" },
       {
         text: "Eliminar",
         style: "destructive",
-        onPress: () => deleteActivity(id),
+        onPress: () => deleteActivity(activity.id),
       },
     ]);
   }
@@ -175,7 +196,7 @@ export function PedidosScreen() {
               onPress={() =>
                 navigation.navigate("NuevaActividad", { activityId: item.id })
               }
-              onDelete={() => handleDelete(item.id, item.title)}
+              onDelete={() => handleDelete(item)}
             />
           )}
           ListEmptyComponent={
@@ -268,6 +289,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   rowInfo: { flex: 1 },
+  rowNameRow: { flexDirection: "row", alignItems: "center", gap: 5 },
   rowName: { fontSize: 14, fontWeight: "700", color: colors.text },
   rowHint: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   rowRight: { alignItems: "flex-end", gap: 5 },

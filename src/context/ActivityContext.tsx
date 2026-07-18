@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Activity } from '../types';
+import { useTransactions } from './TransactionContext';
+import { useInventory } from './InventoryContext';
 
 interface ActivityContextType {
   activities: Activity[];
@@ -16,9 +18,21 @@ const ActivityContext = createContext<ActivityContextType | null>(null);
 
 const STORAGE_KEY = '@antiva_activities';
 
+/**
+ * Un pedido/venta queda "cerrado" cuando está confirmado Y pagado:
+ * en ese momento se descuenta el stock y se genera el ingreso en
+ * Movimientos — y a partir de ahí ya no se puede editar (Activity.stockDeducted).
+ */
+function qualifiesToClose(a: Pick<Activity, 'status' | 'paymentStatus'>) {
+  return a.status === 'confirmed' && a.paymentStatus === 'paid';
+}
+
 export function ActivityProvider({ children }: { children: ReactNode }) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { addTransaction } = useTransactions();
+  const { adjustStock } = useInventory();
 
   useEffect(() => {
     loadActivities();
@@ -40,24 +54,61 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
     setActivities(updated);
   }
 
+  /**
+   * Si la actividad recién quedó confirmada + pagada y aún no se cerró:
+   * descuenta el stock de cada ítem y crea el ingreso en Movimientos.
+   * Devuelve la actividad con relatedEntryId + stockDeducted ya seteados.
+   */
+  async function closeIfNeeded(activity: Activity): Promise<Activity> {
+    if (activity.stockDeducted) return activity;
+    if (!qualifiesToClose(activity)) return activity;
+
+    for (const item of activity.items ?? []) {
+      if (item.productId) {
+        await adjustStock(item.productId, -item.qty);
+      }
+    }
+
+    const entryId = await addTransaction({
+      type: 'income',
+      name: activity.title,
+      amount: activity.totalAmount ?? 0,
+      date: activity.date,
+      notes: activity.notes,
+      channel: activity.channel,
+      paymentStatus: 'paid',
+      sourceActivityId: activity.id,
+    });
+
+    return { ...activity, relatedEntryId: entryId, stockDeducted: true };
+  }
+
   async function addActivity(data: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) {
     const now = new Date().toISOString();
-    const newActivity: Activity = {
+    let newActivity: Activity = {
       ...data,
       id: Date.now().toString(),
       createdAt: now,
       updatedAt: now,
     };
+    newActivity = await closeIfNeeded(newActivity);
     await saveActivities([newActivity, ...activities]);
     return newActivity.id;
   }
 
   async function updateActivity(id: string, data: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) {
-    const updated = activities.map(a =>
-      a.id === id
-        ? { ...a, ...data, updatedAt: new Date().toISOString() }
-        : a
-    );
+    const current = activities.find(a => a.id === id);
+    if (current?.stockDeducted) {
+      throw new Error('Este pedido ya está confirmado y pagado — no se puede editar.');
+    }
+
+    let merged: Activity = current
+      ? { ...current, ...data, updatedAt: new Date().toISOString() }
+      : { ...data, id, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+
+    merged = await closeIfNeeded(merged);
+
+    const updated = activities.map(a => (a.id === id ? merged : a));
     await saveActivities(updated);
   }
 

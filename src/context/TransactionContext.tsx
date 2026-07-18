@@ -4,10 +4,12 @@ import { Transaction } from '../types';
 
 interface TransactionContextType {
   transactions: Transaction[];
-  addTransaction: (t: Omit<Transaction, 'id' | 'createdAt'>) => Promise<void>;
+  addTransaction: (t: Omit<Transaction, 'id' | 'createdAt'>) => Promise<string>;
   deleteTransaction: (id: string) => Promise<void>;
   totalIncome: number;
   totalExpense: number;
+  /** Suma de ingresos con paymentStatus 'pending' — aún no cuentan en totalIncome/balance. */
+  pendingIncome: number;
   balance: number;
   loading: boolean;
 }
@@ -47,14 +49,20 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     await saveTransactions([newTransaction, ...transactions]);
+    return newTransaction.id;
   }
 
   async function deleteTransaction(id: string) {
     await saveTransactions(transactions.filter(t => t.id !== id));
   }
 
+  // paymentStatus sin definir = registros manuales viejos, se asumen pagados.
   const totalIncome = transactions
-    .filter(t => t.type === 'income')
+    .filter(t => t.type === 'income' && t.paymentStatus !== 'pending')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const pendingIncome = transactions
+    .filter(t => t.type === 'income' && t.paymentStatus === 'pending')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalExpense = transactions
@@ -70,6 +78,7 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
       deleteTransaction,
       totalIncome,
       totalExpense,
+      pendingIncome,
       balance,
       loading,
     }}>
