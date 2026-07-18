@@ -19,12 +19,11 @@ const ActivityContext = createContext<ActivityContextType | null>(null);
 const STORAGE_KEY = '@antiva_activities';
 
 /**
- * Un pedido/venta queda "cerrado" cuando está confirmado Y pagado:
- * en ese momento se descuenta el stock y se genera el ingreso en
- * Movimientos — y a partir de ahí ya no se puede editar (Activity.stockDeducted).
+ * Un pedido/venta genera su ingreso en cuanto se marca "Pagado" — no depende
+ * de "Confirmado" ni "Entregado", que son pasos independientes.
  */
-function qualifiesToClose(a: Pick<Activity, 'status' | 'paymentStatus'>) {
-  return a.status === 'confirmed' && a.paymentStatus === 'paid';
+function qualifiesToClose(a: Pick<Activity, 'paid'>) {
+  return a.paid === true;
 }
 
 export function ActivityProvider({ children }: { children: ReactNode }) {
@@ -55,7 +54,7 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
   }
 
   /**
-   * Si la actividad recién quedó confirmada + pagada y aún no se cerró:
+   * Si la actividad recién quedó marcada como pagada y aún no se cerró:
    * descuenta el stock de cada ítem y crea el ingreso en Movimientos.
    * Devuelve la actividad con relatedEntryId + stockDeducted ya seteados.
    */
@@ -98,9 +97,6 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
 
   async function updateActivity(id: string, data: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>) {
     const current = activities.find(a => a.id === id);
-    if (current?.stockDeducted) {
-      throw new Error('Este pedido ya está confirmado y pagado — no se puede editar.');
-    }
 
     let merged: Activity = current
       ? { ...current, ...data, updatedAt: new Date().toISOString() }

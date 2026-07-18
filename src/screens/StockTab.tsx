@@ -142,13 +142,6 @@ export function StockTab() {
   return (
     <>
       <View style={styles.refreshRow}>
-        {catalogState === "offline" ? (
-          <Text style={styles.offlineHint}>
-            Mostrando catálogo guardado (sin conexión)
-          </Text>
-        ) : (
-          <View />
-        )}
         <TouchableOpacity
           onPress={handleRefresh}
           disabled={refreshing}
@@ -161,7 +154,7 @@ export function StockTab() {
             strokeWidth={2.2}
             style={refreshing ? { opacity: 0.4 } : undefined}
           />
-          <Text style={styles.refreshBtnText}>Actualizar</Text>
+          <Text style={styles.refreshBtnText}>Jalar productos</Text>
         </TouchableOpacity>
       </View>
       <FlatList

@@ -155,7 +155,7 @@ export function AdjustStockScreen() {
                         strokeWidth={2.2}
                         style={refreshing ? { opacity: 0.4 } : undefined}
                       />
-                      <Text style={styles.refreshBtnText}>Actualizar</Text>
+                      <Text style={styles.refreshBtnText}>Jalar productos</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.searchBox}>

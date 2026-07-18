@@ -57,18 +57,14 @@ export interface Material {
 // que genera ingreso y descuenta stock — no es una fecha en el calendario.
 
 export type ActivityType = "order" | "event_sale" | "custom";
-export type ActivityStatus =
-  | "pending"
-  | "confirmed"
-  | "in_progress"
-  | "done"
-  | "cancelled";
 
 export interface ActivityItem {
   productId?: string;
   name: string;
   qty: number;
   unitPrice: number;
+  /** Imagen del producto (del catálogo remoto), si aplica. */
+  image?: string;
   /** Solo ventas de evento: cuántas unidades de este ítem se vendieron realmente (qty = cuántas llevaste). */
   qtySold?: number;
 }
@@ -78,17 +74,20 @@ export interface Activity {
   type: ActivityType;
   title: string;
   date: string;
-  status: ActivityStatus;
+  /** Los 3 pasos de un pedido — independientes entre sí, no son un solo estado. */
+  confirmed: boolean;
+  /** Al marcarse true se genera el ingreso en Movimientos y se descuenta el stock (una sola vez). */
+  paid: boolean;
+  /** Al marcarse true, editar el pedido pide confirmación antes de abrir el formulario. */
+  delivered: boolean;
   items?: ActivityItem[];
   totalAmount?: number;
   notes?: string;
   channel?: string;
   /** Solo type 'event_sale': a qué AgendaEvent (fecha del calendario) pertenece esta venta. */
   eventId?: string;
-  /** Pagado / pendiente de cobro. Al marcarse 'paid' se genera/actualiza el Entry de ingreso. */
-  paymentStatus?: PaymentStatus;
   relatedEntryId?: string;
-  /** true = ya se descontó del stock por esta actividad (evita descontar dos veces). */
+  /** true = ya se descontó del stock y se generó el ingreso (evita duplicarlo si se vuelve a marcar 'paid'). */
   stockDeducted?: boolean;
   createdAt: string;
   updatedAt: string;

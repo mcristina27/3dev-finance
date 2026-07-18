@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -15,14 +16,12 @@ import {
   Sparkles,
   Plus,
   Trash2,
-  CalendarDays,
-  Lock,
 } from "lucide-react-native";
 import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency, formatDate } from "../utils/formatters";
-import { Activity, ActivityStatus, PaymentStatus } from "../types";
+import { Activity } from "../types";
 
 const TYPE_ICON: Record<Activity["type"], any> = {
   order: ShoppingBag,
@@ -30,26 +29,35 @@ const TYPE_ICON: Record<Activity["type"], any> = {
   custom: Sparkles,
 };
 
-const STATUS_LABEL: Record<ActivityStatus, string> = {
-  pending: "Pendiente",
-  confirmed: "Confirmado",
-  in_progress: "En proceso",
-  done: "Listo",
-  cancelled: "Cancelado",
-};
-
-const STATUS_COLOR: Record<ActivityStatus, { bg: string; fg: string }> = {
-  pending: { bg: pastel.blueLight, fg: pastel.blueDark },
-  confirmed: { bg: pastel.blueLight, fg: pastel.blueDark },
-  in_progress: { bg: pastel.lilacLight, fg: pastel.lilacDark },
-  done: { bg: pastel.pistachioLight, fg: pastel.pistachioDark },
-  cancelled: { bg: colors.expenseLight, fg: colors.expense },
-};
-
-const PAYMENT_LABEL: Record<PaymentStatus, string> = {
-  paid: "Pagado",
-  pending: "Pendiente de cobro",
-};
+const STATUS_TOGGLES: {
+  key: "confirmed" | "paid" | "delivered";
+  label: string;
+  activeBg: string;
+  activeBorder: string;
+  activeText: string;
+}[] = [
+  {
+    key: "confirmed",
+    label: "Confirmado",
+    activeBg: pastel.blueLight,
+    activeBorder: pastel.blueDark,
+    activeText: pastel.blueDark,
+  },
+  {
+    key: "paid",
+    label: "Pagado",
+    activeBg: pastel.pistachioLight,
+    activeBorder: pastel.pistachioDark,
+    activeText: pastel.pistachioDark,
+  },
+  {
+    key: "delivered",
+    label: "Entregado",
+    activeBg: pastel.berryLight,
+    activeBorder: pastel.berryDark,
+    activeText: pastel.berryDark,
+  },
+];
 
 function ActivityRow({
   activity,
@@ -63,54 +71,56 @@ function ActivityRow({
   onDelete: () => void;
 }) {
   const Icon = TYPE_ICON[activity.type];
-  const statusStyle = STATUS_COLOR[activity.status];
-  const paymentStatus = activity.paymentStatus ?? "paid";
+  const firstImage = activity.items?.find((it) => it.image)?.image;
 
   return (
     <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.75}>
-      <View style={[styles.rowIcon, { backgroundColor: statusStyle.bg }]}>
-        <Icon size={18} color={statusStyle.fg} strokeWidth={1.8} />
-      </View>
-      <View style={styles.rowInfo}>
-        <View style={styles.rowNameRow}>
-          <Text style={styles.rowName} numberOfLines={1}>
-            {activity.title}
-          </Text>
-          {activity.stockDeducted && (
-            <Lock size={12} color={pastel.pistachioDark} strokeWidth={2.4} />
-          )}
+      {firstImage ? (
+        <Image source={{ uri: firstImage }} style={styles.rowThumb} />
+      ) : (
+        <View style={[styles.rowThumb, styles.rowThumbFallback]}>
+          <Icon size={18} color={pastel.blueDark} strokeWidth={1.8} />
         </View>
+      )}
+
+      <View style={styles.rowInfo}>
+        <Text style={styles.rowName} numberOfLines={1}>
+          {activity.title}
+        </Text>
         <Text style={styles.rowHint} numberOfLines={1}>
           {formatDate(activity.date)}
           {activity.channel ? ` · ${activity.channel}` : ""}
           {eventTitle ? ` · ${eventTitle}` : ""}
         </Text>
-      </View>
-      <View style={styles.rowRight}>
         <View style={styles.badgeRow}>
-          <View
-            style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}
-          >
-            <Text style={[styles.statusText, { color: statusStyle.fg }]}>
-              {STATUS_LABEL[activity.status]}
-            </Text>
-          </View>
-          <View
-            style={[
-              styles.payBadge,
-              paymentStatus === "pending" && styles.payBadgePending,
-            ]}
-          >
-            <Text
-              style={[
-                styles.payText,
-                paymentStatus === "pending" && styles.payTextPending,
-              ]}
-            >
-              {PAYMENT_LABEL[paymentStatus]}
-            </Text>
-          </View>
+          {STATUS_TOGGLES.map((s) => {
+            const active = activity[s.key] === true;
+            return (
+              <View
+                key={s.key}
+                style={[
+                  styles.statusBadge,
+                  active && {
+                    backgroundColor: s.activeBg,
+                    borderColor: s.activeBorder,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusText,
+                    { color: active ? s.activeText : colors.textMuted },
+                  ]}
+                >
+                  {s.label}
+                </Text>
+              </View>
+            );
+          })}
         </View>
+      </View>
+
+      <View style={styles.rowRight}>
         {activity.totalAmount != null && (
           <Text style={styles.amount}>
             {formatCurrency(activity.totalAmount)}
@@ -133,13 +143,36 @@ export function PedidosScreen() {
   const { activities, deleteActivity } = useActivities();
   const { events } = useAgendaEvents();
 
-  const sorted = [...activities].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = [...activities].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
+
+  function openActivity(activity: Activity) {
+    if (activity.delivered) {
+      Alert.alert(
+        "Este pedido ya fue entregado",
+        "¿Deseas editarlo de todas formas?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Editar igual",
+            onPress: () =>
+              navigation.navigate("NuevaActividad", {
+                activityId: activity.id,
+              }),
+          },
+        ],
+      );
+      return;
+    }
+    navigation.navigate("NuevaActividad", { activityId: activity.id });
+  }
 
   function handleDelete(activity: Activity) {
     if (activity.stockDeducted) {
       Alert.alert(
         "Este pedido ya generó un ingreso",
-        `"${activity.title}" ya está confirmado, pagado y registrado en Movimientos. Eliminarlo NO revierte el stock descontado ni borra ese ingreso — quedaría suelto. ¿Eliminar de todas formas?`,
+        `"${activity.title}" ya está pagado y registrado en Movimientos. Eliminarlo NO revierte el stock descontado ni borra ese ingreso — quedaría suelto. ¿Eliminar de todas formas?`,
         [
           { text: "Cancelar", style: "cancel" },
           {
@@ -193,9 +226,7 @@ export function PedidosScreen() {
                   ? events.find((e) => e.id === item.eventId)?.title
                   : undefined
               }
-              onPress={() =>
-                navigation.navigate("NuevaActividad", { activityId: item.id })
-              }
+              onPress={() => openActivity(item)}
               onDelete={() => handleDelete(item)}
             />
           )}
@@ -281,30 +312,27 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 10,
   },
-  rowIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+  rowThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    backgroundColor: pastel.blueLight,
   },
-  rowInfo: { flex: 1 },
-  rowNameRow: { flexDirection: "row", alignItems: "center", gap: 5 },
+  rowThumbFallback: { alignItems: "center", justifyContent: "center" },
+  rowInfo: { flex: 1, gap: 3 },
   rowName: { fontSize: 14, fontWeight: "700", color: colors.text },
-  rowHint: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  rowRight: { alignItems: "flex-end", gap: 5 },
-  badgeRow: { flexDirection: "row", gap: 5 },
-  statusBadge: { borderRadius: 8, paddingHorizontal: 9, paddingVertical: 3 },
-  statusText: { fontSize: 10.5, fontWeight: "700" },
-  payBadge: {
+  rowHint: { fontSize: 12, color: colors.textSecondary },
+  rowRight: { alignItems: "flex-end", gap: 8 },
+  badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginTop: 2 },
+  statusBadge: {
     borderRadius: 8,
-    paddingHorizontal: 9,
+    paddingHorizontal: 8,
     paddingVertical: 3,
-    backgroundColor: pastel.pistachioLight,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  payBadgePending: { backgroundColor: colors.expenseLight },
-  payText: { fontSize: 10.5, fontWeight: "700", color: pastel.pistachioDark },
-  payTextPending: { color: colors.expense },
+  statusText: { fontSize: 10, fontWeight: "700" },
   amount: { fontSize: 13, fontWeight: "700", color: colors.text },
   deleteBtn: { padding: 2, marginTop: 2 },
   emptyState: {

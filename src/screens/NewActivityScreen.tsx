@@ -27,37 +27,50 @@ import {
   WifiOff,
   CalendarDays,
   RefreshCw,
-  Lock,
 } from "lucide-react-native";
 import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
+import { DateField } from "../components/DateField";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency, formatDate } from "../utils/formatters";
-import {
-  ActivityType,
-  ActivityStatus,
-  ActivityItem,
-  CatalogProduct,
-  PaymentStatus,
-} from "../types";
+import { ActivityType, ActivityItem, CatalogProduct } from "../types";
 
 const TYPES: { key: ActivityType; label: string; Icon: any }[] = [
   { key: "order", label: "Pedido", Icon: ShoppingBag },
   { key: "event_sale", label: "Venta en evento", Icon: Store },
 ];
 
-const STATUSES: { key: ActivityStatus; label: string }[] = [
-  { key: "pending", label: "Pendiente" },
-  { key: "confirmed", label: "Confirmado" },
-  { key: "in_progress", label: "En proceso" },
-  { key: "done", label: "Listo" },
-  { key: "cancelled", label: "Cancelado" },
-];
+type ToggleKey = "confirmed" | "paid" | "delivered";
 
-const PAYMENT_OPTIONS: { key: PaymentStatus; label: string }[] = [
-  { key: "pending", label: "Pendiente de cobro" },
-  { key: "paid", label: "Pagado" },
+const STATUS_TOGGLES: {
+  key: ToggleKey;
+  label: string;
+  activeBg: string;
+  activeBorder: string;
+  activeText: string;
+}[] = [
+  {
+    key: "confirmed",
+    label: "Confirmado",
+    activeBg: pastel.blueLight,
+    activeBorder: pastel.blueDark,
+    activeText: pastel.blueDark,
+  },
+  {
+    key: "paid",
+    label: "Pagado",
+    activeBg: pastel.pistachioLight,
+    activeBorder: pastel.pistachioDark,
+    activeText: pastel.pistachioDark,
+  },
+  {
+    key: "delivered",
+    label: "Entregado",
+    activeBg: pastel.berryLight,
+    activeBorder: pastel.berryDark,
+    activeText: pastel.berryDark,
+  },
 ];
 
 export function NewActivityScreen() {
@@ -68,7 +81,6 @@ export function NewActivityScreen() {
   const { events } = useAgendaEvents();
   const existing = activityId ? getActivity(activityId) : undefined;
   const isEditing = !!existing;
-  const isLocked = existing?.stockDeducted === true;
 
   const [type, setType] = useState<ActivityType>(
     existing?.type === "event_sale" ? "event_sale" : "order",
@@ -77,12 +89,9 @@ export function NewActivityScreen() {
   const [date, setDate] = useState(
     existing?.date ?? new Date().toISOString().split("T")[0],
   );
-  const [status, setStatus] = useState<ActivityStatus>(
-    existing?.status ?? "pending",
-  );
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
-    existing?.paymentStatus ?? "pending",
-  );
+  const [confirmed, setConfirmed] = useState(existing?.confirmed ?? false);
+  const [paid, setPaid] = useState(existing?.paid ?? false);
+  const [delivered, setDelivered] = useState(existing?.delivered ?? false);
   const [notes, setNotes] = useState(existing?.notes ?? "");
   const [channel, setChannel] = useState(existing?.channel ?? "");
   const [eventId, setEventId] = useState<string | undefined>(existing?.eventId);
@@ -139,6 +148,12 @@ export function NewActivityScreen() {
 
   const orderTotal = items.reduce((sum, it) => sum + it.qty * it.unitPrice, 0);
 
+  function toggleStatus(key: ToggleKey) {
+    if (key === "confirmed") setConfirmed((v) => !v);
+    else if (key === "paid") setPaid((v) => !v);
+    else setDelivered((v) => !v);
+  }
+
   function addProductToItems(p: CatalogProduct) {
     setItems((prev) => {
       const existingItem = prev.find((it) => it.productId === String(p.id));
@@ -154,6 +169,7 @@ export function NewActivityScreen() {
           name: p.name,
           qty: 1,
           unitPrice: p.price ?? 0,
+          image: p.image ?? undefined,
         },
       ];
     });
@@ -227,8 +243,9 @@ export function NewActivityScreen() {
         type,
         title: title.trim(),
         date,
-        status,
-        paymentStatus,
+        confirmed,
+        paid,
+        delivered,
         items,
         totalAmount: orderTotal,
         notes: notes.trim() || undefined,
@@ -252,118 +269,6 @@ export function NewActivityScreen() {
     } finally {
       setSaving(false);
     }
-  }
-
-  if (isLocked) {
-    const linkedEvent = eventId
-      ? sortedEvents.find((ev) => ev.id === eventId)
-      : undefined;
-
-    return (
-      <View style={styles.root}>
-        <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.closeBtn}
-            >
-              <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>
-              {type === "order" ? "Pedido" : "Venta de evento"}
-            </Text>
-            <View style={{ width: 36 }} />
-          </View>
-
-          <ScrollView
-            style={styles.scroll}
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.lockedBanner}>
-              <Lock size={16} color={pastel.pistachioDark} strokeWidth={2.2} />
-              <Text style={styles.lockedBannerText}>
-                Este {type === "order" ? "pedido" : "registro"} ya está
-                confirmado y pagado. Se registró como ingreso en Movimientos y
-                ya no se puede editar.
-              </Text>
-            </View>
-
-            <View style={styles.form}>
-              <View style={styles.field}>
-                <Text style={styles.label}>
-                  {type === "order" ? "Cliente / Pedido" : "Título"}
-                </Text>
-                <Text style={styles.readOnlyValue}>{title}</Text>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Fecha</Text>
-                <Text style={styles.readOnlyValue}>{formatDate(date)}</Text>
-              </View>
-
-              {type === "event_sale" && linkedEvent && (
-                <View style={styles.field}>
-                  <Text style={styles.label}>Evento</Text>
-                  <Text style={styles.readOnlyValue}>
-                    {linkedEvent.title} · {formatDate(linkedEvent.date)}
-                  </Text>
-                </View>
-              )}
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Cobro</Text>
-                <Text style={styles.readOnlyValue}>
-                  {paymentStatus === "paid" ? "Pagado" : "Pendiente de cobro"}
-                </Text>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Estado</Text>
-                <Text style={styles.readOnlyValue}>
-                  {STATUSES.find((s) => s.key === status)?.label ?? status}
-                </Text>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Productos</Text>
-                <View style={styles.itemsList}>
-                  {items.map((item, i) => (
-                    <View key={i} style={styles.itemRow}>
-                      <Text style={styles.itemName} numberOfLines={1}>
-                        {item.name}
-                      </Text>
-                      <Text style={styles.itemSubtotal}>
-                        {item.qty} × {formatCurrency(item.unitPrice)}
-                      </Text>
-                    </View>
-                  ))}
-                  <View style={styles.totalRow}>
-                    <Text style={styles.totalLabel}>Total</Text>
-                    <Text style={styles.totalValue}>
-                      {formatCurrency(orderTotal)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {!!channel && (
-                <View style={styles.field}>
-                  <Text style={styles.label}>Canal</Text>
-                  <Text style={styles.readOnlyValue}>{channel}</Text>
-                </View>
-              )}
-
-              {!!notes && (
-                <View style={styles.field}>
-                  <Text style={styles.label}>Notas</Text>
-                  <Text style={styles.readOnlyValue}>{notes}</Text>
-                </View>
-              )}
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </View>
-    );
   }
 
   return (
@@ -439,13 +344,7 @@ export function NewActivityScreen() {
 
               <View style={styles.field}>
                 <Text style={styles.label}>Fecha</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="AAAA-MM-DD"
-                  placeholderTextColor={colors.textMuted}
-                  value={date}
-                  onChangeText={setDate}
-                />
+                <DateField value={date} onChange={setDate} />
               </View>
 
               {/* ── Vincular a un evento de la Agenda (solo ventas de evento) ── */}
@@ -500,58 +399,41 @@ export function NewActivityScreen() {
               )}
 
               <View style={styles.field}>
-                <Text style={styles.label}>Cobro</Text>
+                <Text style={styles.label}>Estado del pedido</Text>
                 <View style={styles.statusRow}>
-                  {PAYMENT_OPTIONS.map((p) => (
-                    <TouchableOpacity
-                      key={p.key}
-                      style={[
-                        styles.statusChip,
-                        paymentStatus === p.key &&
-                          (p.key === "paid"
-                            ? styles.payChipActivePaid
-                            : styles.payChipActivePending),
-                      ]}
-                      onPress={() => setPaymentStatus(p.key)}
-                    >
-                      <Text
+                  {STATUS_TOGGLES.map((s) => {
+                    const active =
+                      s.key === "confirmed"
+                        ? confirmed
+                        : s.key === "paid"
+                          ? paid
+                          : delivered;
+                    return (
+                      <TouchableOpacity
+                        key={s.key}
                         style={[
-                          styles.statusChipText,
-                          paymentStatus === p.key &&
-                            (p.key === "paid"
-                              ? styles.payChipTextPaid
-                              : styles.payChipTextPending),
+                          styles.statusChip,
+                          active && {
+                            backgroundColor: s.activeBg,
+                            borderColor: s.activeBorder,
+                          },
                         ]}
+                        onPress={() => toggleStatus(s.key)}
                       >
-                        {p.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Estado</Text>
-                <View style={styles.statusRow}>
-                  {STATUSES.map((s) => (
-                    <TouchableOpacity
-                      key={s.key}
-                      style={[
-                        styles.statusChip,
-                        status === s.key && styles.statusChipActive,
-                      ]}
-                      onPress={() => setStatus(s.key)}
-                    >
-                      <Text
-                        style={[
-                          styles.statusChipText,
-                          status === s.key && styles.statusChipTextActive,
-                        ]}
-                      >
-                        {s.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text
+                          style={[
+                            styles.statusChipText,
+                            active && {
+                              color: s.activeText,
+                              fontWeight: "700",
+                            },
+                          ]}
+                        >
+                          {s.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
 
@@ -571,9 +453,7 @@ export function NewActivityScreen() {
                       strokeWidth={2.2}
                       style={refreshing ? { opacity: 0.4 } : undefined}
                     />
-                    <Text style={styles.refreshBtnText}>
-                      Actualizar catálogo
-                    </Text>
+                    <Text style={styles.refreshBtnText}>Jalar productos</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -608,11 +488,6 @@ export function NewActivityScreen() {
                       manual abajo.
                     </Text>
                   </View>
-                )}
-                {catalogState === "offline" && (
-                  <Text style={styles.offlineHint}>
-                    Mostrando catálogo guardado (sin conexión)
-                  </Text>
                 )}
 
                 {(catalogState === "ready" || catalogState === "offline") && (
@@ -676,6 +551,23 @@ export function NewActivityScreen() {
                   <View style={styles.itemsList}>
                     {items.map((item, i) => (
                       <View key={i} style={styles.itemRow}>
+                        {item.image ? (
+                          <Image
+                            source={{ uri: item.image }}
+                            style={styles.itemThumb}
+                          />
+                        ) : item.productId ? (
+                          <View
+                            style={[styles.itemThumb, styles.itemThumbFallback]}
+                          >
+                            <Package
+                              size={12}
+                              color={pastel.blueDark}
+                              strokeWidth={2}
+                            />
+                          </View>
+                        ) : null}
+
                         {item.productId ? (
                           <Text style={styles.itemName} numberOfLines={1}>
                             {item.name}
@@ -857,36 +749,6 @@ const styles = StyleSheet.create({
   typeBtnActive: { backgroundColor: pastel.blueLight },
   typeBtnText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
   typeBtnTextActive: { color: pastel.blueDark, fontWeight: "700" },
-  lockedBanner: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    padding: 14,
-    borderRadius: 16,
-    backgroundColor: pastel.pistachioLight,
-    borderWidth: 1.5,
-    borderColor: pastel.pistachioDark,
-  },
-  lockedBannerText: {
-    flex: 1,
-    fontSize: 12.5,
-    fontWeight: "600",
-    color: pastel.pistachioDark,
-    lineHeight: 18,
-  },
-  readOnlyValue: {
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 15,
-    color: colors.text,
-    fontWeight: "500",
-  },
   form: { paddingHorizontal: 20, gap: 16, paddingBottom: 20 },
   field: { gap: 7 },
   label: {
@@ -930,26 +792,11 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
   },
-  statusChipActive: {
-    backgroundColor: pastel.blueLight,
-    borderColor: pastel.blueDark,
-  },
   statusChipText: {
     fontSize: 12.5,
     fontWeight: "600",
     color: colors.textMuted,
   },
-  statusChipTextActive: { color: pastel.blueDark, fontWeight: "700" },
-  payChipActivePending: {
-    backgroundColor: colors.expenseLight,
-    borderColor: colors.expense,
-  },
-  payChipTextPending: { color: colors.expense, fontWeight: "700" },
-  payChipActivePaid: {
-    backgroundColor: pastel.pistachioLight,
-    borderColor: pastel.pistachioDark,
-  },
-  payChipTextPaid: { color: pastel.pistachioDark, fontWeight: "700" },
   eventChip: {
     flexDirection: "row",
     alignItems: "center",
@@ -988,12 +835,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   catalogStatusText: { fontSize: 12.5, color: colors.textSecondary },
-  offlineHint: {
-    fontSize: 11.5,
-    color: colors.textMuted,
-    marginBottom: 8,
-    fontStyle: "italic",
-  },
   catalogRow: { marginBottom: 12 },
   productCard: {
     width: 96,
@@ -1045,6 +886,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   itemRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  itemThumb: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: pastel.blueLight,
+  },
+  itemThumbFallback: { alignItems: "center", justifyContent: "center" },
   itemName: { flex: 1, fontSize: 12.5, fontWeight: "600", color: colors.text },
   itemNameInput: {
     backgroundColor: colors.surfaceAlt,

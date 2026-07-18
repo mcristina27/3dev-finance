@@ -67,7 +67,7 @@ export async function getCatalog(): Promise<{
 
 /**
  * Igual que getCatalog(), pero ignora el cache "fresco" y siempre intenta
- * traer la versión más nueva de la web. Úsalo para un botón de "Actualizar".
+ * traer la versión más nueva de la web. Úsalo para un botón de "Jalar productos".
  */
 export async function forceRefreshCatalog(): Promise<{
   productos: CatalogProduct[];
