@@ -134,6 +134,23 @@ export interface ProductStock {
   updatedAt: string;
 }
 
+/**
+ * Un movimiento de stock (suma, resta o fijado exacto). Sirve como mini
+ * historial por producto — a futuro, base para métricas de reposición
+ * y de qué tanto se vende cada producto.
+ */
+export interface StockMovement {
+  id: string;
+  productId: string;
+  /** Cuánto cambió (positivo = entrada, negativo = salida). */
+  delta: number;
+  /** Cantidad resultante después de este movimiento. */
+  resultingQty: number;
+  /** 'venta' = descontado automáticamente por un pedido pagado. */
+  reason?: "venta" | "reposicion" | "manual";
+  createdAt: string;
+}
+
 // ─── Recetas (insumos por producto → costo real) ─────────────────────────────
 
 export interface RecipeIngredient {

@@ -85,7 +85,7 @@ export function HomeScreen() {
           >
             <View style={styles.balanceTopRow}>
               <View style={styles.balanceBadge}>
-                <Sparkles size={14} color={colors.white} strokeWidth={2} />
+                <Sparkles size={14} color={colors.textSecondary} strokeWidth={2} />
                 <Text style={styles.balanceLabel}>Balance actual</Text>
               </View>
               <Text style={styles.balanceStatus}>
@@ -263,7 +263,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-  balanceLabel: { fontSize: 12, color: colors.white, fontWeight: "700" },
+  balanceLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontWeight: "700",
+  },
   balanceStatus: {
     fontSize: 12,
     color: "rgba(255,255,255,0.85)",
@@ -272,7 +276,7 @@ const styles = StyleSheet.create({
   balanceAmount: {
     fontSize: 40,
     fontWeight: "800",
-    color: colors.white,
+    color: colors.textSecondary,
     letterSpacing: -1.5,
   },
   statsRow: {

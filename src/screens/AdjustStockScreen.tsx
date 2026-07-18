@@ -27,7 +27,7 @@ import {
 import { useInventory } from "../context/InventoryContext";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
 import { colors, pastel } from "../theme/colors";
-import { formatCurrency } from "../utils/formatters";
+import { formatCurrency, formatDateTime } from "../utils/formatters";
 import { CatalogProduct } from "../types";
 
 type Mode = "add" | "set";
@@ -37,7 +37,8 @@ export function AdjustStockScreen() {
   const route = useRoute<any>();
   const presetProductId = route.params?.productId as string | undefined;
 
-  const { getStock, adjustStock, setStock } = useInventory();
+  const { getStock, adjustStock, setStock, getLastUpdated, getHistory } =
+    useInventory();
 
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const [catalogState, setCatalogState] = useState<
@@ -104,9 +105,13 @@ export function AdjustStockScreen() {
     setSaving(true);
     try {
       if (mode === "add") {
-        await adjustStock(String(selected.id), parsed);
+        await adjustStock(
+          String(selected.id),
+          parsed,
+          parsed > 0 ? "reposicion" : "manual",
+        );
       } else {
-        await setStock(String(selected.id), parsed);
+        await setStock(String(selected.id), parsed, "manual");
       }
       navigation.goBack();
     } catch {
@@ -255,6 +260,54 @@ export function AdjustStockScreen() {
                       </TouchableOpacity>
                     )}
                   </View>
+
+                  {(() => {
+                    const lastUpdated = getLastUpdated(String(selected.id));
+                    const historyEntries = getHistory(String(selected.id)).slice(
+                      0,
+                      8,
+                    );
+                    return (
+                      <View style={styles.historyBlock}>
+                        <Text style={styles.lastUpdatedText}>
+                          {lastUpdated
+                            ? `Última actualización: ${formatDateTime(lastUpdated)}`
+                            : "Sin movimientos registrados todavía"}
+                        </Text>
+
+                        {historyEntries.length > 0 && (
+                          <View style={styles.historyList}>
+                            {historyEntries.map((m) => {
+                              const isPositive = m.delta > 0;
+                              return (
+                                <View key={m.id} style={styles.historyRow}>
+                                  <Text style={styles.historyDate}>
+                                    {formatDateTime(m.createdAt)}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.historyDelta,
+                                      {
+                                        color: isPositive
+                                          ? pastel.pistachioDark
+                                          : colors.expense,
+                                      },
+                                    ]}
+                                  >
+                                    {isPositive ? "+" : ""}
+                                    {m.delta}
+                                  </Text>
+                                  <Text style={styles.historyResult}>
+                                    → {m.resultingQty} u.
+                                  </Text>
+                                </View>
+                              );
+                            })}
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })()}
 
                   <View style={styles.modeToggle}>
                     <TouchableOpacity
@@ -487,6 +540,31 @@ const styles = StyleSheet.create({
   selectedName: { fontSize: 14, fontWeight: "700", color: colors.text },
   selectedMeta: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   changeLink: { fontSize: 12, fontWeight: "700", color: pastel.pistachioDark },
+  historyBlock: { gap: 8 },
+  lastUpdatedText: {
+    fontSize: 11.5,
+    color: colors.textMuted,
+    fontStyle: "italic",
+  },
+  historyList: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  historyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  historyDate: { flex: 1, fontSize: 11.5, color: colors.textSecondary },
+  historyDelta: { fontSize: 12.5, fontWeight: "800", minWidth: 34 },
+  historyResult: { fontSize: 11.5, color: colors.textMuted },
   modeToggle: {
     flexDirection: "row",
     gap: 8,

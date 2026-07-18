@@ -14,6 +14,16 @@ export function formatDate(dateStr: string): string {
   });
 }
 
+export function formatDateTime(isoString: string): string {
+  const date = new Date(isoString);
+  return date.toLocaleString("es-PE", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function getCurrentMonthKey(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;

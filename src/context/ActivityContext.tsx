@@ -64,7 +64,7 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
 
     for (const item of activity.items ?? []) {
       if (item.productId) {
-        await adjustStock(item.productId, -item.qty);
+        await adjustStock(item.productId, -item.qty, 'venta');
       }
     }
 
