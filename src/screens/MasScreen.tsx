@@ -93,7 +93,13 @@ export function MasScreen() {
           <View style={styles.menuCard}>
             <MenuItem Icon={Cloud}      label="Sincronización"   description="Firebase · pendiente"   accentColor="#0EA5E9" disabled />
             <MenuItem Icon={Upload}     label="Exportar reporte" description="PDF / Excel"            accentColor={colors.income} disabled />
-            <MenuItem Icon={FolderOpen} label="Respaldo local"   description="Exportar tus datos"    accentColor={colors.agenda} disabled />
+            <MenuItem
+              Icon={FolderOpen}
+              label="Respaldo local"
+              description="Exporta o restaura tus datos"
+              accentColor={colors.agenda}
+              onPress={() => navigation.navigate('Respaldo')}
+            />
           </View>
 
           <Text style={styles.sectionLabel}>App</Text>

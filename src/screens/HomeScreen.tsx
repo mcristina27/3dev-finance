@@ -89,7 +89,7 @@ export function HomeScreen() {
                 <Text style={styles.balanceLabel}>Balance actual</Text>
               </View>
               <Text style={styles.balanceStatus}>
-                {isPositive ? "¡Todo bien! 🌸" : "Ojo aquí 🍂"}
+                {isPositive ? "¡Todo bien! 🌸" : "Ojo aquí 🍂"} 
               </Text>
             </View>
             <Text style={styles.balanceAmount}>{formatCurrency(balance)}</Text>

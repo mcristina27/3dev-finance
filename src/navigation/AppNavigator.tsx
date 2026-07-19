@@ -16,6 +16,7 @@ import { NewMaterialScreen } from '../screens/NewMaterialScreen';
 import { NewActivityScreen } from '../screens/NewActivityScreen';
 import { NewAgendaEventScreen } from '../screens/NewAgendaEventScreen';
 import { AdjustStockScreen } from '../screens/AdjustStockScreen';
+import { BackupScreen } from '../screens/BackupScreen';
 import { colors, pastel } from '../theme/colors';
 
 const Tab = createBottomTabNavigator();
@@ -129,6 +130,7 @@ export function AppNavigator() {
         {/* Config y Movimientos ya no son tabs — se llega desde el engranaje en Inicio */}
         <Stack.Screen name="Config"      component={MasScreen} />
         <Stack.Screen name="Movimientos" component={MovimientosScreen} />
+        <Stack.Screen name="Respaldo"    component={BackupScreen} />
 
         <Stack.Screen
           name="NuevoMovimiento"
