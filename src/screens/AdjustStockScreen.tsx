@@ -12,12 +12,9 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  Check,
-  X,
   Search,
   Package,
   Plus,
@@ -26,6 +23,9 @@ import {
 } from "lucide-react-native";
 import { useInventory } from "../context/InventoryContext";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
+import { ModalHeader } from "../components/ModalHeader";
+import { GradientButton } from "../components/GradientButton";
+import { FormField } from "../components/FormField";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency, formatDateTime } from "../utils/formatters";
 import { CatalogProduct } from "../types";
@@ -128,16 +128,7 @@ export function AdjustStockScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.closeBtn}
-            >
-              <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Ajustar stock</Text>
-            <View style={{ width: 36 }} />
-          </View>
+          <ModalHeader title="Ajustar stock" />
 
           <ScrollView
             style={styles.scroll}
@@ -344,12 +335,13 @@ export function AdjustStockScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  <View style={styles.field}>
-                    <Text style={styles.label}>
-                      {mode === "add"
+                  <FormField
+                    label={
+                      mode === "add"
                         ? "Cantidad a sumar (usa negativo para restar)"
-                        : "Nueva cantidad exacta"}
-                    </Text>
+                        : "Nueva cantidad exacta"
+                    }
+                  >
                     <View style={styles.qtyInputRow}>
                       {mode === "add" && (
                         <TouchableOpacity
@@ -396,36 +388,21 @@ export function AdjustStockScreen() {
                         </TouchableOpacity>
                       )}
                     </View>
-                  </View>
+                  </FormField>
                 </>
               )}
             </View>
           </ScrollView>
 
           <View style={styles.footer}>
-            <TouchableOpacity
-              style={[
-                styles.saveBtnWrap,
-                (saving || !selected) && { opacity: 0.5 },
-              ]}
+            <GradientButton
+              label="Guardar ajuste"
+              loading={saving}
+              disabled={!selected}
               onPress={handleSave}
-              disabled={saving || !selected}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={[pastel.pistachio, pastel.pistachioDark]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.saveBtn}
-              >
-                {!saving && (
-                  <Check size={18} color={colors.white} strokeWidth={2.5} />
-                )}
-                <Text style={styles.saveBtnText}>
-                  {saving ? "Guardando..." : "Guardar ajuste"}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              colorsRange={[pastel.pistachio, pastel.pistachioDark]}
+              shadowColor={pastel.pistachioDark}
+            />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -438,26 +415,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: colors.text },
   scroll: { flex: 1 },
   form: { paddingHorizontal: 20, paddingTop: 20, gap: 16, paddingBottom: 20 },
   field: { gap: 7 },
@@ -608,21 +565,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
-  saveBtnWrap: {
-    borderRadius: 100,
-    overflow: "hidden",
-    shadowColor: pastel.pistachioDark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.32,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  saveBtn: {
-    height: 56,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  saveBtnText: { color: colors.white, fontSize: 16, fontWeight: "700" },
 });

@@ -1,10 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, ShoppingBag, Package, CalendarDays, Plus } from 'lucide-react-native';
+import { Home, ShoppingBag, Package, CalendarDays } from 'lucide-react-native';
 import { HomeScreen } from '../screens/HomeScreen';
 import { MovimientosScreen } from '../screens/MovimientosScreen';
 import { InsumosScreen } from '../screens/InsumosScreen';
@@ -38,19 +37,15 @@ const TAB_CONFIG: Record<string, {
   Agenda:   { Icon: CalendarDays, label: 'Agenda',     color: pastel.yellowDark,    bgColor: pastel.yellowLight },
 };
 
-// ─── FAB gradient: Dusty Berry ───────────────────────────────────────────────
-const FAB_GRADIENT: readonly [string, string] = [pastel.berry, pastel.berryDark];
-
 // ─── Pill tab bar ─────────────────────────────────────────────────────────────
+// 4 tabs parejos — cada sección (Pedidos, Inventario, Agenda) ya tiene su
+// propio botón "+" contextual, así que no hace falta un FAB central acá.
 
 function PillTabBar(props: any) {
   const { state, navigation } = props;
 
-  const leftTabs  = state.routes.slice(0, 2);
-  const rightTabs = state.routes.slice(2);
-
-  function renderTab(route: any, realIndex: number) {
-    const isFocused = state.index === realIndex;
+  function renderTab(route: any, index: number) {
+    const isFocused = state.index === index;
     const config    = TAB_CONFIG[route.name];
     const TabIcon   = config?.Icon;
     const iconColor = isFocused ? config?.color : colors.textMuted;
@@ -81,28 +76,8 @@ function PillTabBar(props: any) {
 
   return (
     <View style={styles.outerWrap} pointerEvents="box-none">
-      {/* FAB central — acceso rápido a "nuevo pedido" */}
-      <View style={styles.fabWrap} pointerEvents="box-none">
-        <TouchableOpacity
-          onPress={() => navigation.navigate('NuevaActividad')}
-          activeOpacity={0.85}
-          style={styles.fabShadow}
-        >
-          <LinearGradient colors={FAB_GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.fab}>
-            <Plus size={24} color={colors.white} strokeWidth={2.8} />
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
-      {/* Pill blanca */}
       <View style={styles.pill}>
-        <View style={styles.tabGroup}>
-          {leftTabs.map((r: any, i: number) => renderTab(r, i))}
-        </View>
-        <View style={styles.fabGap} />
-        <View style={styles.tabGroup}>
-          {rightTabs.map((r: any, i: number) => renderTab(r, i + 2))}
-        </View>
+        {state.routes.map((r: any, i: number) => renderTab(r, i))}
       </View>
     </View>
   );
@@ -164,35 +139,12 @@ export function AppNavigator() {
 
 // ─── Estilos ──────────────────────────────────────────────────────────────────
 
-const FAB_SIZE = 54;
-
 const styles = StyleSheet.create({
   outerWrap: {
     position: 'absolute',
     bottom: 24,
     left: 16,
     right: 16,
-  },
-  fabWrap: {
-    position: 'absolute',
-    top: -(FAB_SIZE / 2) - 6,
-    left: 0, right: 0,
-    alignItems: 'center',
-    zIndex: 20,
-  },
-  fabShadow: {
-    borderRadius: FAB_SIZE / 2,
-    shadowColor: pastel.berry,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.45,
-    shadowRadius: 14,
-    elevation: 12,
-  },
-  fab: {
-    width: FAB_SIZE, height: FAB_SIZE,
-    borderRadius: FAB_SIZE / 2,
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 3, borderColor: colors.white,
   },
   pill: {
     flexDirection: 'row',
@@ -209,8 +161,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderLight,
   },
-  tabGroup: { flex: 1, flexDirection: 'row' },
-  fabGap:   { width: FAB_SIZE + 16 },
   tabItem: {
     flex: 1, alignItems: 'center',
     gap: 3, paddingVertical: 2,

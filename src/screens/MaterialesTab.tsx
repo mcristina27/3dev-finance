@@ -8,8 +8,9 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Package, Plus, AlertTriangle, Trash2 } from "lucide-react-native";
+import { Package, AlertTriangle, Trash2 } from "lucide-react-native";
 import { useMaterials } from "../context/MaterialContext";
+import { EmptyState } from "../components/EmptyState";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency } from "../utils/formatters";
 import { Material } from "../types";
@@ -107,27 +108,15 @@ export function MaterialesTab() {
           />
         )}
         ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconWrap}>
-              <Package
-                size={32}
-                color={pastel.pistachioDark}
-                strokeWidth={1.5}
-              />
-            </View>
-            <Text style={styles.emptyText}>Sin insumos todavía</Text>
-            <Text style={styles.emptySubtext}>
-              Registra tu stock de materiales, cajas, etiquetas, etc.
-            </Text>
-            <TouchableOpacity
-              style={styles.emptyCta}
-              onPress={() => navigation.navigate("NuevoInsumo")}
-              activeOpacity={0.85}
-            >
-              <Plus size={15} color={colors.white} strokeWidth={2.6} />
-              <Text style={styles.emptyCtaText}>Agregar insumo</Text>
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            Icon={Package}
+            iconColor={pastel.pistachioDark}
+            iconBg={pastel.pistachioLight}
+            title="Sin insumos todavía"
+            subtitle="Registra tu stock de materiales, cajas, etiquetas, etc."
+            ctaLabel="Agregar insumo"
+            onCtaPress={() => navigation.navigate("NuevoInsumo")}
+          />
         }
       />
     </>
@@ -197,42 +186,4 @@ const styles = StyleSheet.create({
   stockText: { fontSize: 12, color: colors.textMuted, fontWeight: "700" },
   stockTextLow: { color: colors.expense },
   deleteBtn: { padding: 2 },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
-    backgroundColor: pastel.pistachioLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 4,
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
-    marginBottom: 18,
-  },
-  emptyCta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: pastel.pistachioDark,
-    borderRadius: 100,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  emptyCtaText: { color: colors.white, fontSize: 14, fontWeight: "700" },
 });

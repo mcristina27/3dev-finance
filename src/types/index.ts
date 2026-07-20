@@ -104,6 +104,8 @@ export interface AgendaEvent {
   date: string;
   location?: string;
   notes?: string;
+  /** Colorcito para identificar el evento en el calendario. Sin definir = color por defecto. */
+  color?: string;
   createdAt: string;
   updatedAt: string;
 }

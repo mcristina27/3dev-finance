@@ -10,15 +10,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import {
-  ShoppingBag,
-  Store,
-  Sparkles,
-  Plus,
-  Trash2,
-} from "lucide-react-native";
+import { ShoppingBag, Store, Sparkles, Trash2 } from "lucide-react-native";
 import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
+import { ScreenListHeader } from "../components/ScreenListHeader";
+import { EmptyState } from "../components/EmptyState";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import { Activity } from "../types";
@@ -197,21 +193,13 @@ export function PedidosScreen() {
   return (
     <View style={styles.root}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        <View style={styles.header}>
-          <View style={styles.headerTitleRow}>
-            <Text style={styles.title}>Pedidos</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{activities.length}</Text>
-            </View>
-          </View>
-          <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => navigation.navigate("NuevaActividad")}
-            activeOpacity={0.8}
-          >
-            <Plus size={18} color={colors.white} strokeWidth={2.6} />
-          </TouchableOpacity>
-        </View>
+        <ScreenListHeader
+          title="Pedidos"
+          count={activities.length}
+          accentColor={pastel.blueDark}
+          accentBg={pastel.blueLight}
+          onAddPress={() => navigation.navigate("NuevaActividad")}
+        />
 
         <FlatList
           data={sorted}
@@ -231,28 +219,15 @@ export function PedidosScreen() {
             />
           )}
           ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconWrap}>
-                <ShoppingBag
-                  size={32}
-                  color={pastel.blueDark}
-                  strokeWidth={1.5}
-                />
-              </View>
-              <Text style={styles.emptyText}>Sin pedidos todavía</Text>
-              <Text style={styles.emptySubtext}>
-                Registra pedidos individuales o ventas de un evento, eligiendo
-                productos de tu catálogo
-              </Text>
-              <TouchableOpacity
-                style={styles.emptyCta}
-                onPress={() => navigation.navigate("NuevaActividad")}
-                activeOpacity={0.85}
-              >
-                <Plus size={15} color={colors.white} strokeWidth={2.6} />
-                <Text style={styles.emptyCtaText}>Agregar pedido</Text>
-              </TouchableOpacity>
-            </View>
+            <EmptyState
+              Icon={ShoppingBag}
+              iconColor={pastel.blueDark}
+              iconBg={pastel.blueLight}
+              title="Sin pedidos todavía"
+              subtitle="Registra pedidos individuales o ventas de un evento, eligiendo productos de tu catálogo"
+              ctaLabel="Agregar pedido"
+              onCtaPress={() => navigation.navigate("NuevaActividad")}
+            />
           }
         />
       </SafeAreaView>
@@ -262,43 +237,6 @@ export function PedidosScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  title: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: colors.text,
-    letterSpacing: -0.5,
-  },
-  badge: {
-    backgroundColor: pastel.blueLight,
-    borderRadius: 100,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  badgeText: { fontSize: 12, fontWeight: "700", color: pastel.blueDark },
-  addBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 14,
-    backgroundColor: pastel.blueDark,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: pastel.blueDark,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
   list: { paddingHorizontal: 20, paddingBottom: 130 },
   row: {
     flexDirection: "row",
@@ -335,42 +273,4 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 10, fontWeight: "700" },
   amount: { fontSize: 13, fontWeight: "700", color: colors.text },
   deleteBtn: { padding: 2, marginTop: 2 },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
-    backgroundColor: pastel.blueLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 4,
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
-    marginBottom: 18,
-  },
-  emptyCta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: pastel.blueDark,
-    borderRadius: 100,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  emptyCtaText: { color: colors.white, fontSize: 14, fontWeight: "700" },
 });

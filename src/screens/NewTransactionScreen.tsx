@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -11,20 +10,18 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import {
-  TrendingUp,
-  TrendingDown,
-  Camera,
-  Check,
-  X,
-} from "lucide-react-native";
+import { TrendingUp, TrendingDown, Camera, X } from "lucide-react-native";
 import { useTransactions } from "../context/TransactionContext";
+import { ModalHeader } from "../components/ModalHeader";
+import { GradientButton } from "../components/GradientButton";
+import { LabeledInput, FormField } from "../components/FormField";
 import { colors, primaryGradient } from "../theme/colors";
 import { TransactionType } from "../types";
+
+const EXPENSE_GRADIENT: readonly [string, string] = ["#F43F5E", "#BE123C"];
 
 export function NewTransactionScreen() {
   const navigation = useNavigation();
@@ -99,17 +96,7 @@ export function NewTransactionScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.closeBtn}
-            >
-              <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Nuevo registro</Text>
-            <View style={{ width: 36 }} />
-          </View>
+          <ModalHeader title="Nuevo registro" />
 
           <ScrollView
             style={styles.scroll}
@@ -162,65 +149,45 @@ export function NewTransactionScreen() {
             </View>
 
             <View style={styles.form}>
-              <View style={styles.field}>
-                <Text style={styles.label}>
-                  {isIncome ? "Nombre del evento" : "Nombre del insumo"}
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder={
-                    isIncome ? "Ej: Feria Makerspace" : "Ej: Filamento PLA 1kg"
-                  }
-                  placeholderTextColor={colors.textMuted}
-                  value={name}
-                  onChangeText={setName}
-                />
-              </View>
+              <LabeledInput
+                label={isIncome ? "Nombre del evento" : "Nombre del insumo"}
+                placeholder={
+                  isIncome ? "Ej: Feria Makerspace" : "Ej: Filamento PLA 1kg"
+                }
+                value={name}
+                onChangeText={setName}
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>
-                  {isIncome ? "Monto recibido (S/)" : "Costo (S/)"}
-                </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    styles.amountInput,
-                    { color: isIncome ? colors.income : colors.expense },
-                  ]}
-                  placeholder="0.00"
-                  placeholderTextColor={colors.textMuted}
-                  value={amount}
-                  onChangeText={setAmount}
-                  keyboardType="decimal-pad"
-                />
-              </View>
+              <LabeledInput
+                label={isIncome ? "Monto recibido (S/)" : "Costo (S/)"}
+                inputStyle={[
+                  styles.amountInput,
+                  { color: isIncome ? colors.income : colors.expense },
+                ]}
+                placeholder="0.00"
+                value={amount}
+                onChangeText={setAmount}
+                keyboardType="decimal-pad"
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Fecha</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="AAAA-MM-DD"
-                  placeholderTextColor={colors.textMuted}
-                  value={date}
-                  onChangeText={setDate}
-                />
-              </View>
+              <LabeledInput
+                label="Fecha"
+                placeholder="AAAA-MM-DD"
+                value={date}
+                onChangeText={setDate}
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Notas (opcional)</Text>
-                <TextInput
-                  style={[styles.input, styles.notesInput]}
-                  placeholder="Agrega detalles..."
-                  placeholderTextColor={colors.textMuted}
-                  value={notes}
-                  onChangeText={setNotes}
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
+              <LabeledInput
+                label="Notas (opcional)"
+                inputStyle={styles.notesInput}
+                placeholder="Agrega detalles..."
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+                numberOfLines={3}
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Fotos (opcional)</Text>
+              <FormField label="Fotos (opcional)">
                 <TouchableOpacity style={styles.photoBtn} onPress={pickImage}>
                   <Camera size={17} color={colors.primary} strokeWidth={2} />
                   <Text style={styles.photoBtnText}>Agregar fotos</Text>
@@ -248,32 +215,18 @@ export function NewTransactionScreen() {
                     ))}
                   </ScrollView>
                 )}
-              </View>
+              </FormField>
             </View>
           </ScrollView>
 
-          {/* Botón guardar */}
           <View style={styles.footer}>
-            <TouchableOpacity
-              style={[styles.saveBtnWrap, saving && { opacity: 0.65 }]}
+            <GradientButton
+              label="Guardar registro"
+              loading={saving}
               onPress={handleSave}
-              disabled={saving}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={isIncome ? primaryGradient : ["#F43F5E", "#BE123C"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.saveBtn}
-              >
-                {!saving && (
-                  <Check size={18} color={colors.white} strokeWidth={2.5} />
-                )}
-                <Text style={styles.saveBtnText}>
-                  {saving ? "Guardando..." : "Guardar registro"}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              colorsRange={isIncome ? primaryGradient : EXPENSE_GRADIENT}
+              shadowColor={isIncome ? colors.primary : EXPENSE_GRADIENT[1]}
+            />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -283,26 +236,6 @@ export function NewTransactionScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: colors.text },
   scroll: { flex: 1 },
   typeToggle: {
     flexDirection: "row",
@@ -328,25 +261,6 @@ const styles = StyleSheet.create({
   typeBtnTextIncome: { color: colors.income },
   typeBtnTextExpense: { color: colors.expense },
   form: { paddingHorizontal: 20, gap: 16, paddingBottom: 20 },
-  field: { gap: 7 },
-  label: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 15,
-    color: colors.text,
-    fontWeight: "500",
-  },
   amountInput: { fontSize: 28, fontWeight: "800", textAlign: "center" },
   notesInput: { height: 80, textAlignVertical: "top" },
   photoBtn: {
@@ -375,21 +289,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
-  saveBtnWrap: {
-    borderRadius: 100,
-    overflow: "hidden",
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.32,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  saveBtn: {
-    height: 56,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  saveBtnText: { color: colors.white, fontSize: 16, fontWeight: "700" },
 });

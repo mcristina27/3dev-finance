@@ -21,6 +21,7 @@ import {
 } from "lucide-react-native";
 import { useInventory } from "../context/InventoryContext";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
+import { EmptyState } from "../components/EmptyState";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency } from "../utils/formatters";
 import { CatalogProduct } from "../types";
@@ -289,15 +290,13 @@ export function StockTab() {
           )
         }
         ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconWrap}>
-              <Boxes size={32} color={pastel.pistachioDark} strokeWidth={1.5} />
-            </View>
-            <Text style={styles.emptyText}>Tu catálogo está vacío</Text>
-            <Text style={styles.emptySubtext}>
-              Agrega productos en tu web para verlos acá
-            </Text>
-          </View>
+          <EmptyState
+            Icon={Boxes}
+            iconColor={pastel.pistachioDark}
+            iconBg={pastel.pistachioLight}
+            title="Tu catálogo está vacío"
+            subtitle="Agrega productos en tu web para verlos acá"
+          />
         }
       />
     </>
@@ -422,32 +421,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginTop: 4,
-  },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
-    backgroundColor: pastel.pistachioLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 4,
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
   },
 });

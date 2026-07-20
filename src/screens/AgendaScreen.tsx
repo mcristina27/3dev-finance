@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -9,15 +9,32 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { CalendarDays, MapPin, Plus, Trash2 } from "lucide-react-native";
+import { CalendarProvider, ExpandableCalendar } from "react-native-calendars";
+import { CalendarDays, MapPin, Trash2, List } from "lucide-react-native";
 import { useAgendaEvents } from "../context/AgendaEventContext";
+import { ScreenListHeader } from "../components/ScreenListHeader";
+import { EmptyState } from "../components/EmptyState";
 import { colors, pastel } from "../theme/colors";
 import { formatDate } from "../utils/formatters";
 import { AgendaEvent } from "../types";
+import { DEFAULT_AGENDA_COLOR } from "../constants/agendaColors";
+
+function todayISO() {
+  return new Date().toISOString().split("T")[0];
+}
 
 function isPast(dateStr: string) {
-  const today = new Date().toISOString().split("T")[0];
-  return dateStr < today;
+  return dateStr < todayISO();
+}
+
+function formatLongDate(dateStr: string) {
+  const date = new Date(dateStr + "T00:00:00");
+  const label = date.toLocaleDateString("es-PE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 function EventRow({
@@ -30,6 +47,7 @@ function EventRow({
   onDelete: () => void;
 }) {
   const past = isPast(event.date);
+  const color = event.color ?? DEFAULT_AGENDA_COLOR;
 
   return (
     <TouchableOpacity
@@ -37,20 +55,29 @@ function EventRow({
       onPress={onPress}
       activeOpacity={0.75}
     >
-      <View style={[styles.rowIcon, past && styles.rowIconPast]}>
+      <View
+        style={[
+          styles.rowIcon,
+          { backgroundColor: color + "22" },
+          past && styles.rowIconPast,
+        ]}
+      >
         <CalendarDays
           size={18}
-          color={past ? colors.textMuted : pastel.yellowDark}
+          color={past ? colors.textMuted : color}
           strokeWidth={1.8}
         />
       </View>
       <View style={styles.rowInfo}>
-        <Text
-          style={[styles.rowName, past && styles.rowNamePast]}
-          numberOfLines={1}
-        >
-          {event.title}
-        </Text>
+        <View style={styles.rowNameRow}>
+          <View style={[styles.dot, { backgroundColor: color }]} />
+          <Text
+            style={[styles.rowName, past && styles.rowNamePast]}
+            numberOfLines={1}
+          >
+            {event.title}
+          </Text>
+        </View>
         <View style={styles.rowMetaRow}>
           <Text style={styles.rowHint}>{formatDate(event.date)}</Text>
           {event.location && (
@@ -75,7 +102,34 @@ export function AgendaScreen() {
   const navigation = useNavigation<any>();
   const { events, deleteEvent } = useAgendaEvents();
 
-  const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
+  const [selectedDate, setSelectedDate] = useState(todayISO());
+  const [mode, setMode] = useState<"day" | "all">("day");
+
+  const sorted = useMemo(
+    () => [...events].sort((a, b) => a.date.localeCompare(b.date)),
+    [events],
+  );
+
+  const dayEvents = useMemo(
+    () => sorted.filter((e) => e.date === selectedDate),
+    [sorted, selectedDate],
+  );
+
+  const markedDates = useMemo(() => {
+    const marks: Record<string, any> = {};
+    for (const ev of events) {
+      const color = ev.color ?? DEFAULT_AGENDA_COLOR;
+      if (!marks[ev.date]) marks[ev.date] = { dots: [] };
+      marks[ev.date].dots.push({ key: ev.id, color });
+    }
+    marks[selectedDate] = {
+      ...(marks[selectedDate] ?? {}),
+      selected: true,
+      selectedColor: pastel.yellowLight,
+      selectedTextColor: pastel.yellowDark,
+    };
+    return marks;
+  }, [events, selectedDate]);
 
   function handleDelete(id: string, title: string) {
     Alert.alert("Eliminar evento", `¿Eliminar "${title}"?`, [
@@ -88,63 +142,115 @@ export function AgendaScreen() {
     ]);
   }
 
+  const listData = mode === "day" ? dayEvents : sorted;
+
   return (
     <View style={styles.root}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        <View style={styles.header}>
-          <View style={styles.headerTitleRow}>
-            <Text style={styles.title}>Agenda</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{events.length}</Text>
-            </View>
-          </View>
-          <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => navigation.navigate("NuevoEvento")}
-            activeOpacity={0.8}
-          >
-            <Plus size={18} color={colors.white} strokeWidth={2.6} />
-          </TouchableOpacity>
-        </View>
-
-        <FlatList
-          data={sorted}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <EventRow
-              event={item}
-              onPress={() =>
-                navigation.navigate("NuevoEvento", { eventId: item.id })
-              }
-              onDelete={() => handleDelete(item.id, item.title)}
-            />
-          )}
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconWrap}>
-                <CalendarDays
-                  size={32}
-                  color={pastel.yellowDark}
-                  strokeWidth={1.5}
-                />
-              </View>
-              <Text style={styles.emptyText}>Sin eventos agendados</Text>
-              <Text style={styles.emptySubtext}>
-                Anota ferias y mercados a los que vas a ir
-              </Text>
-              <TouchableOpacity
-                style={styles.emptyCta}
-                onPress={() => navigation.navigate("NuevoEvento")}
-                activeOpacity={0.85}
-              >
-                <Plus size={15} color={colors.white} strokeWidth={2.6} />
-                <Text style={styles.emptyCtaText}>Agregar evento</Text>
-              </TouchableOpacity>
-            </View>
+        <ScreenListHeader
+          title="Agenda"
+          count={events.length}
+          accentColor={pastel.yellowDark}
+          accentBg={pastel.yellowLight}
+          onAddPress={() =>
+            navigation.navigate("NuevoEvento", {
+              initialDate: mode === "day" ? selectedDate : undefined,
+            })
           }
         />
+
+        <CalendarProvider date={selectedDate} onDateChanged={setSelectedDate}>
+          <ExpandableCalendar
+            firstDay={1}
+            markingType="multi-dot"
+            markedDates={markedDates}
+            onDayPress={(day) => {
+              setSelectedDate(day.dateString);
+              setMode("day");
+            }}
+            theme={{
+              calendarBackground: colors.background,
+              monthTextColor: colors.text,
+              textMonthFontWeight: "800",
+              textMonthFontSize: 16,
+              arrowColor: colors.textSecondary,
+              textSectionTitleColor: colors.textMuted,
+              dayTextColor: colors.text,
+              textDisabledColor: colors.borderLight,
+              todayTextColor: pastel.yellowDark,
+              selectedDayBackgroundColor: pastel.yellowLight,
+              selectedDayTextColor: pastel.yellowDark,
+            }}
+            style={styles.calendar}
+          />
+
+          <View style={styles.listHeader}>
+            <Text style={styles.listHeaderTitle}>
+              {mode === "day" ? formatLongDate(selectedDate) : "Todos los eventos"}
+            </Text>
+            <TouchableOpacity
+              style={styles.modeBtn}
+              onPress={() =>
+                setMode((m) => {
+                  if (m === "all") {
+                    setSelectedDate(todayISO());
+                    return "day";
+                  }
+                  return "all";
+                })
+              }
+              hitSlop={6}
+            >
+              {mode === "day" ? (
+                <List size={13} color={pastel.yellowDark} strokeWidth={2.2} />
+              ) : (
+                <CalendarDays
+                  size={13}
+                  color={pastel.yellowDark}
+                  strokeWidth={2.2}
+                />
+              )}
+              <Text style={styles.modeBtnText}>
+                {mode === "day" ? "Ver todos" : "Ver por día"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={listData}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <EventRow
+                event={item}
+                onPress={() =>
+                  navigation.navigate("NuevoEvento", { eventId: item.id })
+                }
+                onDelete={() => handleDelete(item.id, item.title)}
+              />
+            )}
+            ListEmptyComponent={
+              <EmptyState
+                Icon={CalendarDays}
+                iconColor={pastel.yellowDark}
+                iconBg={pastel.yellowLight}
+                title={
+                  mode === "day"
+                    ? "Sin eventos este día"
+                    : "Sin eventos agendados"
+                }
+                subtitle="Anota ferias y mercados a los que vas a ir"
+                ctaLabel="Agregar evento"
+                onCtaPress={() =>
+                  navigation.navigate("NuevoEvento", {
+                    initialDate: mode === "day" ? selectedDate : undefined,
+                  })
+                }
+              />
+            }
+          />
+        </CalendarProvider>
       </SafeAreaView>
     </View>
   );
@@ -152,43 +258,34 @@ export function AgendaScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
+  calendar: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  listHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 8,
   },
-  headerTitleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  title: {
-    fontSize: 26,
-    fontWeight: "800",
+  listHeaderTitle: {
+    fontSize: 14,
+    fontWeight: "700",
     color: colors.text,
-    letterSpacing: -0.5,
+    flexShrink: 1,
   },
-  badge: {
-    backgroundColor: pastel.yellowLight,
-    borderRadius: 100,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  badgeText: { fontSize: 12, fontWeight: "700", color: pastel.yellowDark },
-  addBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 14,
-    backgroundColor: pastel.yellowDark,
+  modeBtn: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    shadowColor: pastel.yellowDark,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 100,
+    backgroundColor: pastel.yellowLight,
   },
+  modeBtnText: { fontSize: 11.5, fontWeight: "700", color: pastel.yellowDark },
   list: { paddingHorizontal: 20, paddingBottom: 130 },
   row: {
     flexDirection: "row",
@@ -207,13 +304,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: pastel.yellowLight,
     alignItems: "center",
     justifyContent: "center",
   },
   rowIconPast: { backgroundColor: colors.surfaceAlt },
   rowInfo: { flex: 1 },
-  rowName: { fontSize: 14, fontWeight: "700", color: colors.text },
+  rowNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  rowName: { fontSize: 14, fontWeight: "700", color: colors.text, flexShrink: 1 },
   rowNamePast: { color: colors.textMuted },
   rowMetaRow: {
     flexDirection: "row",
@@ -224,42 +322,4 @@ const styles = StyleSheet.create({
   rowHint: { fontSize: 12, color: colors.textSecondary },
   rowDot: { fontSize: 12, color: colors.textMuted },
   deleteBtn: { padding: 2 },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
-    backgroundColor: pastel.yellowLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 4,
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: "center",
-    marginBottom: 18,
-  },
-  emptyCta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: pastel.yellowDark,
-    borderRadius: 100,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  emptyCtaText: { color: colors.white, fontSize: 14, fontWeight: "700" },
 });

@@ -9,9 +9,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { FileText, ArrowLeft } from "lucide-react-native";
+import { FileText } from "lucide-react-native";
 import { useTransactions } from "../context/TransactionContext";
 import { TransactionCard } from "../components/TransactionCard";
+import { BackHeader } from "../components/BackHeader";
 import { colors } from "../theme/colors";
 import { EntryType } from "../types";
 
@@ -47,23 +48,15 @@ export function MovimientosScreen() {
   return (
     <View style={styles.root}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-            hitSlop={8}
-          >
-            <ArrowLeft
-              size={18}
-              color={colors.textSecondary}
-              strokeWidth={2.2}
-            />
-          </TouchableOpacity>
-          <Text style={styles.title}>Movimientos</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{filtered.length}</Text>
-          </View>
-        </View>
+        <BackHeader
+          title="Movimientos"
+          style={styles.header}
+          right={
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{filtered.length}</Text>
+            </View>
+          }
+        />
 
         <View style={styles.filterRow}>
           {FILTERS.map((f) => (
@@ -129,28 +122,8 @@ export function MovimientosScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
     paddingBottom: 8,
-    flexDirection: "row",
-    alignItems: "center",
     gap: 10,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: colors.text,
-    letterSpacing: -0.5,
-  },
-  backBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   badge: {
     backgroundColor: colors.primaryLight,

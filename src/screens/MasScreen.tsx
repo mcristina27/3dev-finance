@@ -5,8 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import {
   Tag, Store, CircleDollarSign, Cloud, Upload,
-  FolderOpen, Palette, Bell, User, ChevronRight, ArrowLeft, ArrowLeftRight,
+  FolderOpen, Palette, Bell, User, ChevronRight, ArrowLeftRight,
 } from 'lucide-react-native';
+import { BackHeader } from '../components/BackHeader';
 import { colors, primaryGradient } from '../theme/colors';
 
 type LucideIcon = React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
@@ -53,12 +54,7 @@ export function MasScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={['top']}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={8}>
-              <ArrowLeft size={18} color={colors.textSecondary} strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.title}>Configuración</Text>
-          </View>
+          <BackHeader title="Configuración" />
 
           {/* Perfil */}
           <LinearGradient colors={primaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.profileCard}>
@@ -119,17 +115,6 @@ export function MasScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   scroll: { paddingBottom: 130 },
-  header: {
-    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20,
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-  },
-  backBtn: {
-    width: 34, height: 34, borderRadius: 12,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: colors.border,
-  },
-  title: { fontSize: 26, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
   profileCard: {
     marginHorizontal: 20, marginBottom: 28, borderRadius: 24, padding: 20,
     flexDirection: 'row', alignItems: 'center', gap: 14,

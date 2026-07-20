@@ -12,11 +12,9 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  Check,
   X,
   Search,
   Plus,
@@ -32,6 +30,9 @@ import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
 import { DateField } from "../components/DateField";
+import { ModalHeader } from "../components/ModalHeader";
+import { GradientButton } from "../components/GradientButton";
+import { FormField, LabeledInput } from "../components/FormField";
 import { colors, pastel } from "../theme/colors";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import { ActivityType, ActivityItem, CatalogProduct } from "../types";
@@ -278,19 +279,9 @@ export function NewActivityScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.closeBtn}
-            >
-              <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>
-              {isEditing ? "Editar" : "Nuevo"}{" "}
-              {type === "order" ? "pedido" : "venta de evento"}
-            </Text>
-            <View style={{ width: 36 }} />
-          </View>
+          <ModalHeader
+            title={`${isEditing ? "Editar" : "Nuevo"} ${type === "order" ? "pedido" : "venta de evento"}`}
+          />
 
           <ScrollView
             style={styles.scroll}
@@ -325,32 +316,24 @@ export function NewActivityScreen() {
             </View>
 
             <View style={styles.form}>
-              <View style={styles.field}>
-                <Text style={styles.label}>
-                  {type === "order" ? "Cliente / Pedido" : "Título"}
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder={
-                    type === "order"
-                      ? "Ej: Ana — Clickers x10"
-                      : "Ej: Venta feria Maker Lima"
-                  }
-                  placeholderTextColor={colors.textMuted}
-                  value={title}
-                  onChangeText={setTitle}
-                />
-              </View>
+              <LabeledInput
+                label={type === "order" ? "Cliente / Pedido" : "Título"}
+                placeholder={
+                  type === "order"
+                    ? "Ej: Ana — Clickers x10"
+                    : "Ej: Venta feria Maker Lima"
+                }
+                value={title}
+                onChangeText={setTitle}
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Fecha</Text>
+              <FormField label="Fecha">
                 <DateField value={date} onChange={setDate} />
-              </View>
+              </FormField>
 
               {/* ── Vincular a un evento de la Agenda (solo ventas de evento) ── */}
               {type === "event_sale" && (
-                <View style={styles.field}>
-                  <Text style={styles.label}>Evento (opcional)</Text>
+                <FormField label="Evento (opcional)">
                   {sortedEvents.length === 0 ? (
                     <Text style={styles.catalogStatusText}>
                       No tienes eventos en tu Agenda todavía.
@@ -395,11 +378,10 @@ export function NewActivityScreen() {
                       </View>
                     </ScrollView>
                   )}
-                </View>
+                </FormField>
               )}
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Estado del pedido</Text>
+              <FormField label="Estado del pedido">
                 <View style={styles.statusRow}>
                   {STATUS_TOGGLES.map((s) => {
                     const active =
@@ -435,7 +417,7 @@ export function NewActivityScreen() {
                     );
                   })}
                 </View>
-              </View>
+              </FormField>
 
               {/* ── Selector de productos ── */}
               <View style={styles.field}>
@@ -650,53 +632,33 @@ export function NewActivityScreen() {
                 )}
               </View>
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Canal (opcional)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Feria, online, pedido directo..."
-                  placeholderTextColor={colors.textMuted}
-                  value={channel}
-                  onChangeText={setChannel}
-                />
-              </View>
+              <LabeledInput
+                label="Canal (opcional)"
+                placeholder="Feria, online, pedido directo..."
+                value={channel}
+                onChangeText={setChannel}
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Notas (opcional)</Text>
-                <TextInput
-                  style={[styles.input, styles.notesInput]}
-                  placeholder="Agrega detalles..."
-                  placeholderTextColor={colors.textMuted}
-                  value={notes}
-                  onChangeText={setNotes}
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
+              <LabeledInput
+                label="Notas (opcional)"
+                inputStyle={styles.notesInput}
+                placeholder="Agrega detalles..."
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+                numberOfLines={3}
+              />
             </View>
           </ScrollView>
 
           <View style={styles.footer}>
-            <TouchableOpacity
-              style={[styles.saveBtnWrap, saving && { opacity: 0.65 }]}
+            <GradientButton
+              label="Guardar"
+              loading={saving}
               onPress={handleSave}
-              disabled={saving}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={[pastel.blue, pastel.blueDark]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.saveBtn}
-              >
-                {!saving && (
-                  <Check size={18} color={colors.white} strokeWidth={2.5} />
-                )}
-                <Text style={styles.saveBtnText}>
-                  {saving ? "Guardando..." : "Guardar"}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              colorsRange={[pastel.blue, pastel.blueDark]}
+              shadowColor={pastel.blueDark}
+            />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -706,26 +668,6 @@ export function NewActivityScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: colors.text },
   scroll: { flex: 1 },
   typeToggle: {
     flexDirection: "row",
@@ -770,17 +712,6 @@ const styles = StyleSheet.create({
     color: pastel.blueDark,
     textTransform: "none",
     letterSpacing: 0,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 15,
-    color: colors.text,
-    fontWeight: "500",
   },
   notesInput: { height: 80, textAlignVertical: "top" },
   statusRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
@@ -950,21 +881,4 @@ const styles = StyleSheet.create({
   totalLabel: { fontSize: 13, fontWeight: "700", color: colors.text },
   totalValue: { fontSize: 17, fontWeight: "800", color: pastel.blueDark },
   footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
-  saveBtnWrap: {
-    borderRadius: 100,
-    overflow: "hidden",
-    shadowColor: pastel.blueDark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.32,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  saveBtn: {
-    height: 56,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  saveBtnText: { color: colors.white, fontSize: 16, fontWeight: "700" },
 });

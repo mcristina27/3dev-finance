@@ -3,18 +3,18 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Check, X } from "lucide-react-native";
 import { useMaterials } from "../context/MaterialContext";
+import { ModalHeader } from "../components/ModalHeader";
+import { GradientButton } from "../components/GradientButton";
+import { FormField, LabeledInput } from "../components/FormField";
 import { colors, pastel } from "../theme/colors";
 import { MaterialUnit } from "../types";
 
@@ -102,38 +102,21 @@ export function NewMaterialScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.closeBtn}
-            >
-              <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>
-              {isEditing ? "Editar insumo" : "Nuevo insumo"}
-            </Text>
-            <View style={{ width: 36 }} />
-          </View>
+          <ModalHeader title={isEditing ? "Editar insumo" : "Nuevo insumo"} />
 
           <ScrollView
             style={styles.scroll}
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.form}>
-              <View style={styles.field}>
-                <Text style={styles.label}>Nombre</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ej: Filamento PLA"
-                  placeholderTextColor={colors.textMuted}
-                  value={name}
-                  onChangeText={setName}
-                />
-              </View>
+              <LabeledInput
+                label="Nombre"
+                placeholder="Ej: Filamento PLA"
+                value={name}
+                onChangeText={setName}
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Unidad</Text>
+              <FormField label="Unidad">
                 <View style={styles.unitRow}>
                   {UNITS.map((u) => (
                     <TouchableOpacity
@@ -155,93 +138,62 @@ export function NewMaterialScreen() {
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
+              </FormField>
 
               <View style={styles.row2}>
-                <View style={[styles.field, { flex: 1 }]}>
-                  <Text style={styles.label}>Stock actual</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="0"
-                    placeholderTextColor={colors.textMuted}
-                    value={stock}
-                    onChangeText={setStock}
-                    keyboardType="decimal-pad"
-                  />
-                </View>
-                <View style={[styles.field, { flex: 1 }]}>
-                  <Text style={styles.label}>Stock mínimo</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Opcional"
-                    placeholderTextColor={colors.textMuted}
-                    value={minStock}
-                    onChangeText={setMinStock}
-                    keyboardType="decimal-pad"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.label}>Costo por unidad (S/)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="0.00"
-                  placeholderTextColor={colors.textMuted}
-                  value={costPerUnit}
-                  onChangeText={setCostPerUnit}
+                <LabeledInput
+                  label="Stock actual"
+                  style={{ flex: 1 }}
+                  placeholder="0"
+                  value={stock}
+                  onChangeText={setStock}
+                  keyboardType="decimal-pad"
+                />
+                <LabeledInput
+                  label="Stock mínimo"
+                  style={{ flex: 1 }}
+                  placeholder="Opcional"
+                  value={minStock}
+                  onChangeText={setMinStock}
                   keyboardType="decimal-pad"
                 />
               </View>
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Categoría (opcional)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ej: Filamentos, Empaque..."
-                  placeholderTextColor={colors.textMuted}
-                  value={category}
-                  onChangeText={setCategory}
-                />
-              </View>
+              <LabeledInput
+                label="Costo por unidad (S/)"
+                placeholder="0.00"
+                value={costPerUnit}
+                onChangeText={setCostPerUnit}
+                keyboardType="decimal-pad"
+              />
 
-              <View style={styles.field}>
-                <Text style={styles.label}>Notas (opcional)</Text>
-                <TextInput
-                  style={[styles.input, styles.notesInput]}
-                  placeholder="Agrega detalles..."
-                  placeholderTextColor={colors.textMuted}
-                  value={notes}
-                  onChangeText={setNotes}
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
+              <LabeledInput
+                label="Categoría (opcional)"
+                placeholder="Ej: Filamentos, Empaque..."
+                value={category}
+                onChangeText={setCategory}
+              />
+
+              <LabeledInput
+                label="Notas (opcional)"
+                inputStyle={styles.notesInput}
+                placeholder="Agrega detalles..."
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+                numberOfLines={3}
+              />
             </View>
           </ScrollView>
 
-          {/* Botón guardar */}
           <View style={styles.footer}>
-            <TouchableOpacity
-              style={[styles.saveBtnWrap, saving && { opacity: 0.65 }]}
+            <GradientButton
+              label="Guardar insumo"
+              loading={saving}
               onPress={handleSave}
-              disabled={saving}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={[pastel.pistachio, pastel.pistachioDark]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.saveBtn}
-              >
-                {!saving && (
-                  <Check size={18} color={colors.white} strokeWidth={2.5} />
-                )}
-                <Text style={styles.saveBtnText}>
-                  {saving ? "Guardando..." : "Guardar insumo"}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              colorsRange={[pastel.pistachio, pastel.pistachioDark]}
+              shadowColor={pastel.pistachioDark}
+            />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -251,48 +203,9 @@ export function NewMaterialScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: colors.text },
   scroll: { flex: 1 },
   form: { paddingHorizontal: 20, paddingTop: 20, gap: 16, paddingBottom: 20 },
   row2: { flexDirection: "row", gap: 12 },
-  field: { gap: 7 },
-  label: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 15,
-    color: colors.text,
-    fontWeight: "500",
-  },
   notesInput: { height: 80, textAlignVertical: "top" },
   unitRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   unitChip: {
@@ -310,21 +223,4 @@ const styles = StyleSheet.create({
   unitChipText: { fontSize: 13, fontWeight: "600", color: colors.textMuted },
   unitChipTextActive: { color: pastel.pistachioDark, fontWeight: "700" },
   footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
-  saveBtnWrap: {
-    borderRadius: 100,
-    overflow: "hidden",
-    shadowColor: pastel.pistachioDark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.32,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  saveBtn: {
-    height: 56,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  saveBtnText: { color: colors.white, fontSize: 16, fontWeight: "700" },
 });

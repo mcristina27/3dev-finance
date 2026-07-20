@@ -13,13 +13,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { ArrowLeft, Share2, FolderDown, ShieldCheck } from "lucide-react-native";
+import { Share2, FolderDown, ShieldCheck } from "lucide-react-native";
 import {
   buildBackupString,
   parseBackupString,
   restoreFromPayload,
   summarizeBackup,
 } from "../services/backupService";
+import { BackHeader } from "../components/BackHeader";
 import { colors, pastel } from "../theme/colors";
 import { formatDateTime } from "../utils/formatters";
 
@@ -112,20 +113,7 @@ export function BackupScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scroll}
           >
-            <View style={styles.header}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.backBtn}
-                hitSlop={8}
-              >
-                <ArrowLeft
-                  size={18}
-                  color={colors.textSecondary}
-                  strokeWidth={2.2}
-                />
-              </TouchableOpacity>
-              <Text style={styles.title}>Respaldo de datos</Text>
-            </View>
+            <BackHeader title="Respaldo de datos" titleSize={22} />
 
             <View style={styles.infoCard}>
               <ShieldCheck
@@ -206,25 +194,6 @@ export function BackupScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   scroll: { paddingBottom: 60 },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  backBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  title: { fontSize: 22, fontWeight: "800", color: colors.text, letterSpacing: -0.4 },
   infoCard: {
     flexDirection: "row",
     alignItems: "flex-start",
