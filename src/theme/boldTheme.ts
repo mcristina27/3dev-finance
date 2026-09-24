@@ -4,7 +4,7 @@
 
 export const bold = {
   // Fondo cálido tipo Foody
-  bg: "#FBF2E4",
+  bg: "#F4F5EF",
   surface: "#FFFFFF",
 
   // Rosa — color principal (del logo)
