@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -16,10 +16,15 @@ import { NewActivityScreen } from '../screens/NewActivityScreen';
 import { NewAgendaEventScreen } from '../screens/NewAgendaEventScreen';
 import { AdjustStockScreen } from '../screens/AdjustStockScreen';
 import { BackupScreen } from '../screens/BackupScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import { SignUpScreen } from '../screens/SignUpScreen';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
+import { useAuth } from '../context/AuthContext';
 import { bold, hardShadow } from '../theme/boldTheme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
 
 type LucideIcon = React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 
@@ -97,43 +102,73 @@ function Tabs() {
   );
 }
 
+// ─── Stack de autenticación (sin sesión) ───────────────────────────────────────
+
+function AuthNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Registro" component={SignUpScreen} />
+      <AuthStack.Screen name="RecuperarContrasena" component={ForgotPasswordScreen} />
+    </AuthStack.Navigator>
+  );
+}
+
+// ─── Stack principal (con sesión) ──────────────────────────────────────────────
+
+function MainNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Main" component={Tabs} />
+
+      {/* Config y Movimientos ya no son tabs — se llega desde el engranaje en Inicio */}
+      <Stack.Screen name="Config"      component={MasScreen} />
+      <Stack.Screen name="Movimientos" component={MovimientosScreen} />
+      <Stack.Screen name="Respaldo"    component={BackupScreen} />
+
+      <Stack.Screen
+        name="NuevoMovimiento"
+        component={NewTransactionScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="NuevoInsumo"
+        component={NewMaterialScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="NuevaActividad"
+        component={NewActivityScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="NuevoEvento"
+        component={NewAgendaEventScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="AjustarStock"
+        component={AdjustStockScreen}
+        options={{ presentation: 'modal' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 export function AppNavigator() {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={styles.splash}>
+        <ActivityIndicator size="large" color={bold.pink} />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Main" component={Tabs} />
-
-        {/* Config y Movimientos ya no son tabs — se llega desde el engranaje en Inicio */}
-        <Stack.Screen name="Config"      component={MasScreen} />
-        <Stack.Screen name="Movimientos" component={MovimientosScreen} />
-        <Stack.Screen name="Respaldo"    component={BackupScreen} />
-
-        <Stack.Screen
-          name="NuevoMovimiento"
-          component={NewTransactionScreen}
-          options={{ presentation: 'modal' }}
-        />
-        <Stack.Screen
-          name="NuevoInsumo"
-          component={NewMaterialScreen}
-          options={{ presentation: 'modal' }}
-        />
-        <Stack.Screen
-          name="NuevaActividad"
-          component={NewActivityScreen}
-          options={{ presentation: 'modal' }}
-        />
-        <Stack.Screen
-          name="NuevoEvento"
-          component={NewAgendaEventScreen}
-          options={{ presentation: 'modal' }}
-        />
-        <Stack.Screen
-          name="AjustarStock"
-          component={AdjustStockScreen}
-          options={{ presentation: 'modal' }}
-        />
-      </Stack.Navigator>
+      {session ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 }
@@ -141,6 +176,12 @@ export function AppNavigator() {
 // ─── Estilos ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  splash: {
+    flex: 1,
+    backgroundColor: bold.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   outerWrap: {
     position: 'absolute',
     bottom: 24,
