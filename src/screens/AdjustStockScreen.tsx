@@ -26,7 +26,7 @@ import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
 import { ModalHeader } from "../components/ModalHeader";
 import { GradientButton } from "../components/GradientButton";
 import { FormField } from "../components/FormField";
-import { colors, pastel } from "../theme/colors";
+import { bold, hardShadow } from "../theme/boldTheme";
 import { formatCurrency, formatDateTime } from "../utils/formatters";
 import { CatalogProduct } from "../types";
 
@@ -147,7 +147,7 @@ export function AdjustStockScreen() {
                     >
                       <RefreshCw
                         size={13}
-                        color={pastel.pistachioDark}
+                        color={bold.blue}
                         strokeWidth={2.2}
                         style={refreshing ? { opacity: 0.4 } : undefined}
                       />
@@ -157,13 +157,13 @@ export function AdjustStockScreen() {
                   <View style={styles.searchBox}>
                     <Search
                       size={15}
-                      color={colors.textMuted}
+                      color={bold.textMuted}
                       strokeWidth={2}
                     />
                     <TextInput
                       style={styles.searchInput}
                       placeholder="Buscar producto..."
-                      placeholderTextColor={colors.textMuted}
+                      placeholderTextColor={bold.textMuted}
                       value={search}
                       onChangeText={setSearch}
                     />
@@ -171,7 +171,7 @@ export function AdjustStockScreen() {
 
                   {catalogState === "loading" && (
                     <View style={styles.catalogStatus}>
-                      <ActivityIndicator color={pastel.pistachioDark} />
+                      <ActivityIndicator color={bold.blue} />
                       <Text style={styles.catalogStatusText}>
                         Cargando catálogo...
                       </Text>
@@ -204,7 +204,7 @@ export function AdjustStockScreen() {
                                 styles.productImgFallback,
                               ]}
                             >
-                              <Package size={16} color={pastel.pistachioDark} />
+                              <Package size={16} color={bold.blue} />
                             </View>
                           )}
                           <Text style={styles.productRowName} numberOfLines={1}>
@@ -232,7 +232,7 @@ export function AdjustStockScreen() {
                       <View
                         style={[styles.selectedImg, styles.productImgFallback]}
                       >
-                        <Package size={22} color={pastel.pistachioDark} />
+                        <Package size={22} color={bold.blue} />
                       </View>
                     )}
                     <View style={{ flex: 1 }}>
@@ -280,8 +280,8 @@ export function AdjustStockScreen() {
                                       styles.historyDelta,
                                       {
                                         color: isPositive
-                                          ? pastel.pistachioDark
-                                          : colors.expense,
+                                          ? bold.blue
+                                          : bold.red,
                                       },
                                     ]}
                                   >
@@ -355,7 +355,7 @@ export function AdjustStockScreen() {
                         >
                           <Minus
                             size={16}
-                            color={colors.expense}
+                            color={bold.red}
                             strokeWidth={2.4}
                           />
                         </TouchableOpacity>
@@ -365,7 +365,7 @@ export function AdjustStockScreen() {
                         placeholder={
                           mode === "add" ? "Ej: 5 o -2" : `Ej: ${currentQty}`
                         }
-                        placeholderTextColor={colors.textMuted}
+                        placeholderTextColor={bold.textMuted}
                         value={value}
                         onChangeText={setValue}
                         keyboardType="numbers-and-punctuation"
@@ -382,7 +382,7 @@ export function AdjustStockScreen() {
                         >
                           <Plus
                             size={16}
-                            color={pastel.pistachioDark}
+                            color={bold.blue}
                             strokeWidth={2.4}
                           />
                         </TouchableOpacity>
@@ -400,8 +400,8 @@ export function AdjustStockScreen() {
               loading={saving}
               disabled={!selected}
               onPress={handleSave}
-              colorsRange={[pastel.pistachio, pastel.pistachioDark]}
-              shadowColor={pastel.pistachioDark}
+              colorsRange={[bold.blue, bold.blue]}
+              shadowColor={bold.blue}
             />
           </View>
         </KeyboardAvoidingView>
@@ -413,47 +413,48 @@ export function AdjustStockScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: bold.bg,
   },
   scroll: { flex: 1 },
   form: { paddingHorizontal: 20, paddingTop: 20, gap: 16, paddingBottom: 20 },
   field: { gap: 7 },
   label: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: bold.textSecondary,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   labelRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   refreshBtn: { flexDirection: "row", alignItems: "center", gap: 5 },
-  refreshBtnText: { fontSize: 11, fontWeight: "700", color: pastel.pistachioDark },
+  refreshBtnText: { fontSize: 11, fontWeight: "700", color: bold.blue },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 10,
   },
-  searchInput: { flex: 1, fontSize: 14, color: colors.text },
+  searchInput: { flex: 1, fontSize: 14, color: bold.black },
   catalogStatus: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingVertical: 10,
   },
-  catalogStatusText: { fontSize: 12.5, color: colors.textSecondary },
+  catalogStatusText: { fontSize: 12.5, color: bold.textSecondary },
   productList: {
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2.5,
+    borderColor: bold.black,
     overflow: "hidden",
+    ...hardShadow(3),
   },
   productRow: {
     flexDirection: "row",
@@ -462,52 +463,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    borderBottomColor: bold.black,
   },
   productImg: {
     width: 34,
     height: 34,
     borderRadius: 9,
-    backgroundColor: pastel.pistachioLight,
+    backgroundColor: bold.blueLight,
   },
   productImgFallback: { alignItems: "center", justifyContent: "center" },
   productRowName: {
     flex: 1,
     fontSize: 13,
     fontWeight: "600",
-    color: colors.text,
+    color: bold.black,
   },
-  productRowStock: { fontSize: 12, fontWeight: "700", color: colors.textMuted },
+  productRowStock: { fontSize: 12, fontWeight: "700", color: bold.textMuted },
   selectedCard: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2.5,
+    borderColor: bold.black,
     padding: 12,
+    ...hardShadow(3),
   },
   selectedImg: {
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: pastel.pistachioLight,
+    backgroundColor: bold.blueLight,
   },
-  selectedName: { fontSize: 14, fontWeight: "700", color: colors.text },
-  selectedMeta: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  changeLink: { fontSize: 12, fontWeight: "700", color: pastel.pistachioDark },
+  selectedName: { fontSize: 14, fontWeight: "700", color: bold.black },
+  selectedMeta: { fontSize: 12, color: bold.textSecondary, marginTop: 2 },
+  changeLink: { fontSize: 12, fontWeight: "700", color: bold.blue },
   historyBlock: { gap: 8 },
   lastUpdatedText: {
     fontSize: 11.5,
-    color: colors.textMuted,
+    color: bold.textMuted,
     fontStyle: "italic",
   },
   historyList: {
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2,
+    borderColor: bold.black,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
@@ -517,19 +519,19 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    borderBottomColor: bold.black,
   },
-  historyDate: { flex: 1, fontSize: 11.5, color: colors.textSecondary },
+  historyDate: { flex: 1, fontSize: 11.5, color: bold.textSecondary },
   historyDelta: { fontSize: 12.5, fontWeight: "800", minWidth: 34 },
-  historyResult: { fontSize: 11.5, color: colors.textMuted },
+  historyResult: { fontSize: 11.5, color: bold.textMuted },
   modeToggle: {
     flexDirection: "row",
     gap: 8,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderRadius: 14,
     padding: 4,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
   },
   modeBtn: {
     flex: 1,
@@ -537,32 +539,32 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  modeBtnActive: { backgroundColor: pastel.pistachioLight },
-  modeBtnText: { fontSize: 12.5, color: colors.textMuted, fontWeight: "600" },
-  modeBtnTextActive: { color: pastel.pistachioDark, fontWeight: "700" },
+  modeBtnActive: { backgroundColor: bold.blueLight },
+  modeBtnText: { fontSize: 12.5, color: bold.textMuted, fontWeight: "600" },
+  modeBtnTextActive: { color: bold.blue, fontWeight: "700" },
   qtyInputRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   qtySignBtn: {
     width: 40,
     height: 48,
     borderRadius: 12,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     alignItems: "center",
     justifyContent: "center",
   },
   input: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: bold.black,
     fontWeight: "500",
     textAlign: "center",
   },
-  footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
+  footer: { padding: 20, borderTopWidth: 1, borderTopColor: bold.black },
 });

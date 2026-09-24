@@ -15,7 +15,7 @@ import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
 import { ScreenListHeader } from "../components/ScreenListHeader";
 import { EmptyState } from "../components/EmptyState";
-import { colors, pastel } from "../theme/colors";
+import { bold, boldBorder, hardShadow } from "../theme/boldTheme";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import { Activity } from "../types";
 
@@ -29,29 +29,25 @@ const STATUS_TOGGLES: {
   key: "confirmed" | "paid" | "delivered";
   label: string;
   activeBg: string;
-  activeBorder: string;
   activeText: string;
 }[] = [
   {
     key: "confirmed",
     label: "Confirmado",
-    activeBg: pastel.blueLight,
-    activeBorder: pastel.blueDark,
-    activeText: pastel.blueDark,
+    activeBg: bold.blueLight,
+    activeText: bold.black,
   },
   {
     key: "paid",
     label: "Pagado",
-    activeBg: pastel.pistachioLight,
-    activeBorder: pastel.pistachioDark,
-    activeText: pastel.pistachioDark,
+    activeBg: bold.mintLight,
+    activeText: bold.black,
   },
   {
     key: "delivered",
     label: "Entregado",
-    activeBg: pastel.berryLight,
-    activeBorder: pastel.berryDark,
-    activeText: pastel.berryDark,
+    activeBg: bold.pinkLight,
+    activeText: bold.black,
   },
 ];
 
@@ -75,7 +71,7 @@ function ActivityRow({
         <Image source={{ uri: firstImage }} style={styles.rowThumb} />
       ) : (
         <View style={[styles.rowThumb, styles.rowThumbFallback]}>
-          <Icon size={18} color={pastel.blueDark} strokeWidth={1.8} />
+          <Icon size={18} color={bold.black} strokeWidth={1.8} />
         </View>
       )}
 
@@ -98,14 +94,14 @@ function ActivityRow({
                   styles.statusBadge,
                   active && {
                     backgroundColor: s.activeBg,
-                    borderColor: s.activeBorder,
+                    borderColor: bold.black,
                   },
                 ]}
               >
                 <Text
                   style={[
                     styles.statusText,
-                    { color: active ? s.activeText : colors.textMuted },
+                    { color: active ? s.activeText : bold.textMuted },
                   ]}
                 >
                   {s.label}
@@ -127,7 +123,7 @@ function ActivityRow({
           onPress={onDelete}
           hitSlop={8}
         >
-          <Trash2 size={14} color={colors.textMuted} strokeWidth={2} />
+          <Trash2 size={14} color={bold.textMuted} strokeWidth={2} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -196,8 +192,8 @@ export function PedidosScreen() {
         <ScreenListHeader
           title="Pedidos"
           count={activities.length}
-          accentColor={pastel.blueDark}
-          accentBg={pastel.blueLight}
+          accentColor={bold.pink}
+          accentBg={bold.pinkLight}
           onAddPress={() => navigation.navigate("NuevaActividad")}
         />
 
@@ -221,8 +217,8 @@ export function PedidosScreen() {
           ListEmptyComponent={
             <EmptyState
               Icon={ShoppingBag}
-              iconColor={pastel.blueDark}
-              iconBg={pastel.blueLight}
+              iconColor={bold.pink}
+              iconBg={bold.pinkLight}
               title="Sin pedidos todavía"
               subtitle="Registra pedidos individuales o ventas de un evento, eligiendo productos de tu catálogo"
               ctaLabel="Agregar pedido"
@@ -236,41 +232,43 @@ export function PedidosScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: bold.bg },
   list: { paddingHorizontal: 20, paddingBottom: 130 },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: colors.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 12,
     marginBottom: 10,
+    ...boldBorder,
+    ...hardShadow(3),
   },
   rowThumb: {
     width: 44,
     height: 44,
     borderRadius: 13,
-    backgroundColor: pastel.blueLight,
+    backgroundColor: bold.pinkLight,
+    borderWidth: 2,
+    borderColor: bold.black,
   },
   rowThumbFallback: { alignItems: "center", justifyContent: "center" },
   rowInfo: { flex: 1, gap: 3 },
-  rowName: { fontSize: 14, fontWeight: "700", color: colors.text },
-  rowHint: { fontSize: 12, color: colors.textSecondary },
+  rowName: { fontSize: 14, fontWeight: "800", color: bold.black },
+  rowHint: { fontSize: 12, color: bold.textSecondary },
   rowRight: { alignItems: "flex-end", gap: 8 },
   badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginTop: 2 },
   statusBadge: {
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: bold.bg,
+    borderWidth: 1.5,
+    borderColor: bold.black,
   },
-  statusText: { fontSize: 10, fontWeight: "700" },
-  amount: { fontSize: 13, fontWeight: "700", color: colors.text },
+  statusText: { fontSize: 10, fontWeight: "800" },
+  amount: { fontSize: 13, fontWeight: "800", color: bold.black },
   deleteBtn: { padding: 2, marginTop: 2 },
 });

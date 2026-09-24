@@ -16,25 +16,26 @@ import { NewActivityScreen } from '../screens/NewActivityScreen';
 import { NewAgendaEventScreen } from '../screens/NewAgendaEventScreen';
 import { AdjustStockScreen } from '../screens/AdjustStockScreen';
 import { BackupScreen } from '../screens/BackupScreen';
-import { colors, pastel } from '../theme/colors';
+import { bold, hardShadow } from '../theme/boldTheme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 type LucideIcon = React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 
-// Cada tab tiene su propio color pastel — 4 tabs principales, sin Movimientos/Más
-// (esos viven dentro de Configuración, accesible desde Inicio).
+// Navbar negra — cada tab tiene su propio color fuerte para el chip activo,
+// con el ícono en negro o blanco según el contraste. 4 tabs principales, sin
+// Movimientos/Más (esos viven dentro de Configuración, accesible desde Inicio).
 const TAB_CONFIG: Record<string, {
   Icon: LucideIcon;
   label: string;
-  color: string;
   bgColor: string;
+  onColor: string;
 }> = {
-  Inicio:   { Icon: Home,         label: 'Inicio',     color: pastel.lilac,         bgColor: pastel.lilacLight },
-  Pedidos:  { Icon: ShoppingBag,  label: 'Pedidos',    color: pastel.blueDark,      bgColor: pastel.blueLight },
-  Insumos:  { Icon: Package,      label: 'Inventario', color: pastel.pistachioDark, bgColor: pastel.pistachioLight },
-  Agenda:   { Icon: CalendarDays, label: 'Agenda',     color: pastel.yellowDark,    bgColor: pastel.yellowLight },
+  Inicio:   { Icon: Home,         label: 'Inicio',     bgColor: bold.yellow, onColor: bold.black },
+  Pedidos:  { Icon: ShoppingBag,  label: 'Pedidos',    bgColor: bold.pink,   onColor: bold.white },
+  Insumos:  { Icon: Package,      label: 'Inventario', bgColor: bold.blue,   onColor: bold.white },
+  Agenda:   { Icon: CalendarDays, label: 'Agenda',     bgColor: bold.mint,  onColor: bold.black },
 };
 
 // ─── Pill tab bar ─────────────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ function PillTabBar(props: any) {
     const isFocused = state.index === index;
     const config    = TAB_CONFIG[route.name];
     const TabIcon   = config?.Icon;
-    const iconColor = isFocused ? config?.color : colors.textMuted;
+    const iconColor = isFocused ? config?.onColor : bold.textMuted;
 
     function onPress() {
       const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
@@ -59,14 +60,14 @@ function PillTabBar(props: any) {
       <TouchableOpacity key={route.key} style={styles.tabItem} onPress={onPress} activeOpacity={0.7}>
         <View style={[
           styles.tabIconWrap,
-          isFocused && { backgroundColor: config?.bgColor },
+          isFocused && { backgroundColor: config?.bgColor, borderWidth: 2, borderColor: bold.black },
         ]}>
           {TabIcon && <TabIcon size={19} color={iconColor} strokeWidth={isFocused ? 2.4 : 1.8} />}
         </View>
         <Text style={[
           styles.tabLabel,
-          { color: isFocused ? config?.color : colors.textMuted,
-            fontWeight: isFocused ? '700' : '500' },
+          { color: isFocused ? bold.black : bold.textMuted,
+            fontWeight: isFocused ? '800' : '500' },
         ]}>
           {config?.label}
         </Text>
@@ -148,18 +149,14 @@ const styles = StyleSheet.create({
   },
   pill: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
+    backgroundColor: bold.surface,
     borderRadius: 28,
     paddingVertical: 10,
     paddingHorizontal: 4,
     alignItems: 'center',
-    shadowColor: '#C4B5FD',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.20,
-    shadowRadius: 24,
-    elevation: 14,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
+    borderWidth: 2.5,
+    borderColor: bold.black,
+    ...hardShadow(5),
   },
   tabItem: {
     flex: 1, alignItems: 'center',

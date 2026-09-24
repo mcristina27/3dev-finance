@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { TrendingUp, TrendingDown, Camera } from "lucide-react-native";
 import { Transaction } from "../types";
-import { colors, pastel } from "../theme/colors";
+import { bold, boldBorder, hardShadow } from "../theme/boldTheme";
 import { formatCurrency, formatDate } from "../utils/formatters";
 
 interface Props {
@@ -13,10 +13,8 @@ interface Props {
 export function TransactionCard({ transaction, onPress }: Props) {
   const isIncome = transaction.type === "income";
 
-  const iconColor = isIncome ? pastel.lilacDark : pastel.orangeDark;
-  const iconBg = isIncome ? pastel.lilacLight : pastel.orangeLight;
-  const amountBg = isIncome ? pastel.lilacSoft : pastel.orangeSoft;
-  const amountBorder = isIncome ? pastel.lilacLight : pastel.orangeLight;
+  const accent = isIncome ? bold.pink : bold.yellowDark;
+  const accentBg = isIncome ? bold.pinkLight : bold.yellowLight;
 
   return (
     <TouchableOpacity
@@ -24,11 +22,11 @@ export function TransactionCard({ transaction, onPress }: Props) {
       onPress={onPress}
       activeOpacity={0.75}
     >
-      <View style={[styles.iconBox, { backgroundColor: iconBg }]}>
+      <View style={[styles.iconBox, { backgroundColor: accent }]}>
         {isIncome ? (
-          <TrendingUp size={18} color={iconColor} strokeWidth={2.2} />
+          <TrendingUp size={18} color={bold.white} strokeWidth={2.6} />
         ) : (
-          <TrendingDown size={18} color={iconColor} strokeWidth={2.2} />
+          <TrendingDown size={18} color={bold.white} strokeWidth={2.6} />
         )}
       </View>
 
@@ -40,20 +38,15 @@ export function TransactionCard({ transaction, onPress }: Props) {
           <Text style={styles.date}>{formatDate(transaction.date)}</Text>
           {transaction.photos && transaction.photos.length > 0 && (
             <View style={styles.photoBadge}>
-              <Camera size={9} color={colors.textMuted} strokeWidth={2} />
+              <Camera size={9} color={bold.textMuted} strokeWidth={2} />
               <Text style={styles.photoCount}>{transaction.photos.length}</Text>
             </View>
           )}
         </View>
       </View>
 
-      <View
-        style={[
-          styles.amountChip,
-          { backgroundColor: amountBg, borderColor: amountBorder },
-        ]}
-      >
-        <Text style={[styles.amount, { color: iconColor }]}>
+      <View style={[styles.amountChip, { backgroundColor: accentBg }]}>
+        <Text style={[styles.amount, { color: bold.black }]}>
           {isIncome ? "+" : "-"}
           {formatCurrency(transaction.amount)}
         </Text>
@@ -66,17 +59,13 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: colors.border,
     padding: 14,
     marginBottom: 10,
     gap: 12,
-    shadowColor: "#C4B5FD",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
+    ...boldBorder,
+    ...hardShadow(3),
   },
   iconBox: {
     width: 44,
@@ -84,23 +73,26 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: bold.black,
   },
   info: { flex: 1 },
   name: {
     fontSize: 14,
-    fontWeight: "700",
-    color: colors.text,
+    fontWeight: "800",
+    color: bold.black,
     marginBottom: 3,
   },
   meta: { flexDirection: "row", alignItems: "center", gap: 6 },
-  date: { fontSize: 12, color: colors.textSecondary },
+  date: { fontSize: 12, color: bold.textSecondary, fontWeight: "600" },
   photoBadge: { flexDirection: "row", alignItems: "center", gap: 2 },
-  photoCount: { fontSize: 11, color: colors.textMuted },
+  photoCount: { fontSize: 11, color: bold.textMuted },
   amountChip: {
     borderRadius: 100,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderWidth: 1,
+    borderWidth: 1.5,
+    borderColor: bold.black,
   },
-  amount: { fontSize: 13, fontWeight: "800" },
+  amount: { fontSize: 13, fontWeight: "900" },
 });

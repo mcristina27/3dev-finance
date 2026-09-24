@@ -14,7 +14,7 @@ import { CalendarDays, MapPin, Trash2, List } from "lucide-react-native";
 import { useAgendaEvents } from "../context/AgendaEventContext";
 import { ScreenListHeader } from "../components/ScreenListHeader";
 import { EmptyState } from "../components/EmptyState";
-import { colors, pastel } from "../theme/colors";
+import { bold, hardShadow } from "../theme/boldTheme";
 import { formatDate } from "../utils/formatters";
 import { AgendaEvent } from "../types";
 import { DEFAULT_AGENDA_COLOR } from "../constants/agendaColors";
@@ -64,7 +64,7 @@ function EventRow({
       >
         <CalendarDays
           size={18}
-          color={past ? colors.textMuted : color}
+          color={past ? bold.textMuted : color}
           strokeWidth={1.8}
         />
       </View>
@@ -83,7 +83,7 @@ function EventRow({
           {event.location && (
             <>
               <Text style={styles.rowDot}>·</Text>
-              <MapPin size={11} color={colors.textMuted} strokeWidth={2} />
+              <MapPin size={11} color={bold.textMuted} strokeWidth={2} />
               <Text style={styles.rowHint} numberOfLines={1}>
                 {event.location}
               </Text>
@@ -92,7 +92,7 @@ function EventRow({
         </View>
       </View>
       <TouchableOpacity style={styles.deleteBtn} onPress={onDelete} hitSlop={8}>
-        <Trash2 size={14} color={colors.textMuted} strokeWidth={2} />
+        <Trash2 size={14} color={bold.textMuted} strokeWidth={2} />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -125,8 +125,8 @@ export function AgendaScreen() {
     marks[selectedDate] = {
       ...(marks[selectedDate] ?? {}),
       selected: true,
-      selectedColor: pastel.yellowLight,
-      selectedTextColor: pastel.yellowDark,
+      selectedColor: bold.mintLight,
+      selectedTextColor: bold.mint,
     };
     return marks;
   }, [events, selectedDate]);
@@ -150,8 +150,8 @@ export function AgendaScreen() {
         <ScreenListHeader
           title="Agenda"
           count={events.length}
-          accentColor={pastel.yellowDark}
-          accentBg={pastel.yellowLight}
+          accentColor={bold.mint}
+          accentBg={bold.mintLight}
           onAddPress={() =>
             navigation.navigate("NuevoEvento", {
               initialDate: mode === "day" ? selectedDate : undefined,
@@ -169,18 +169,33 @@ export function AgendaScreen() {
               setMode("day");
             }}
             theme={{
-              calendarBackground: colors.background,
-              monthTextColor: colors.text,
-              textMonthFontWeight: "800",
+              calendarBackground: bold.bg,
+              monthTextColor: bold.black,
+              textMonthFontWeight: "900",
               textMonthFontSize: 16,
-              arrowColor: colors.textSecondary,
-              textSectionTitleColor: colors.textMuted,
-              dayTextColor: colors.text,
-              textDisabledColor: colors.borderLight,
-              todayTextColor: pastel.yellowDark,
-              selectedDayBackgroundColor: pastel.yellowLight,
-              selectedDayTextColor: pastel.yellowDark,
-            }}
+              arrowColor: bold.black,
+              textSectionTitleColor: bold.textSecondary,
+              textDayHeaderFontWeight: "700",
+              dayTextColor: bold.black,
+              textDayFontWeight: "700",
+              textDisabledColor: bold.textMuted,
+              todayTextColor: bold.black,
+              todayBackgroundColor: bold.yellow,
+              selectedDayBackgroundColor: bold.mint,
+              selectedDayTextColor: bold.black,
+              "stylesheet.day.basic": {
+                today: {
+                  borderRadius: 16,
+                  borderWidth: 2,
+                  borderColor: bold.black,
+                },
+                selected: {
+                  borderRadius: 16,
+                  borderWidth: 2,
+                  borderColor: bold.black,
+                },
+              },
+            } as any}
             style={styles.calendar}
           />
 
@@ -202,11 +217,11 @@ export function AgendaScreen() {
               hitSlop={6}
             >
               {mode === "day" ? (
-                <List size={13} color={pastel.yellowDark} strokeWidth={2.2} />
+                <List size={13} color={bold.mint} strokeWidth={2.2} />
               ) : (
                 <CalendarDays
                   size={13}
-                  color={pastel.yellowDark}
+                  color={bold.mint}
                   strokeWidth={2.2}
                 />
               )}
@@ -233,8 +248,8 @@ export function AgendaScreen() {
             ListEmptyComponent={
               <EmptyState
                 Icon={CalendarDays}
-                iconColor={pastel.yellowDark}
-                iconBg={pastel.yellowLight}
+                iconColor={bold.mint}
+                iconBg={bold.mintLight}
                 title={
                   mode === "day"
                     ? "Sin eventos este día"
@@ -257,10 +272,10 @@ export function AgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: bold.bg },
   calendar: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomWidth: 2.5,
+    borderBottomColor: bold.black,
   },
   listHeader: {
     flexDirection: "row",
@@ -273,7 +288,7 @@ const styles = StyleSheet.create({
   listHeaderTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.text,
+    color: bold.black,
     flexShrink: 1,
   },
   modeBtn: {
@@ -283,21 +298,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 100,
-    backgroundColor: pastel.yellowLight,
+    backgroundColor: bold.mintLight,
+    borderWidth: 1.5,
+    borderColor: bold.black,
   },
-  modeBtnText: { fontSize: 11.5, fontWeight: "700", color: pastel.yellowDark },
+  modeBtnText: { fontSize: 11.5, fontWeight: "700", color: bold.mint },
   list: { paddingHorizontal: 20, paddingBottom: 130 },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2.5,
+    borderColor: bold.black,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 12,
     marginBottom: 10,
+    ...hardShadow(3),
   },
   rowPast: { opacity: 0.55 },
   rowIcon: {
@@ -306,20 +324,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: bold.black,
   },
-  rowIconPast: { backgroundColor: colors.surfaceAlt },
+  rowIconPast: { backgroundColor: bold.bg },
   rowInfo: { flex: 1 },
   rowNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  rowName: { fontSize: 14, fontWeight: "700", color: colors.text, flexShrink: 1 },
-  rowNamePast: { color: colors.textMuted },
+  rowName: { fontSize: 14, fontWeight: "700", color: bold.black, flexShrink: 1 },
+  rowNamePast: { color: bold.textMuted },
   rowMetaRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     marginTop: 2,
   },
-  rowHint: { fontSize: 12, color: colors.textSecondary },
-  rowDot: { fontSize: 12, color: colors.textMuted },
+  rowHint: { fontSize: 12, color: bold.textSecondary },
+  rowDot: { fontSize: 12, color: bold.textMuted },
   deleteBtn: { padding: 2 },
 });

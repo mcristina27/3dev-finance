@@ -18,7 +18,7 @@ import { DateField } from "../components/DateField";
 import { ModalHeader } from "../components/ModalHeader";
 import { GradientButton } from "../components/GradientButton";
 import { FormField, LabeledInput } from "../components/FormField";
-import { colors, pastel } from "../theme/colors";
+import { bold } from "../theme/boldTheme";
 import { AGENDA_COLORS, DEFAULT_AGENDA_COLOR } from "../constants/agendaColors";
 
 export function NewAgendaEventScreen() {
@@ -111,11 +111,11 @@ export function NewAgendaEventScreen() {
 
               <FormField label="Lugar (opcional)">
                 <View style={styles.inputRow}>
-                  <MapPin size={15} color={colors.textMuted} strokeWidth={2} />
+                  <MapPin size={15} color={bold.textMuted} strokeWidth={2} />
                   <TextInput
                     style={styles.inputInline}
                     placeholder="Ej: Parque Kennedy, Miraflores"
-                    placeholderTextColor={colors.textMuted}
+                    placeholderTextColor={bold.textMuted}
                     value={location}
                     onChangeText={setLocation}
                   />
@@ -139,8 +139,8 @@ export function NewAgendaEventScreen() {
               label="Guardar evento"
               loading={saving}
               onPress={handleSave}
-              colorsRange={[pastel.yellow, pastel.yellowDark]}
-              shadowColor={pastel.yellowDark}
+              colorsRange={[bold.mint, bold.mint]}
+              shadowColor={bold.mint}
             />
           </View>
         </KeyboardAvoidingView>
@@ -150,7 +150,7 @@ export function NewAgendaEventScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: bold.bg },
   scroll: { flex: 1 },
   form: { paddingHorizontal: 20, paddingTop: 20, gap: 16, paddingBottom: 20 },
   notesInput: { height: 80, textAlignVertical: "top" },
@@ -159,21 +159,21 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "transparent",
+    borderWidth: 1.5,
+    borderColor: bold.black,
   },
-  colorSwatchActive: { borderColor: colors.text },
+  colorSwatchActive: { borderWidth: 3 },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    backgroundColor: bold.surface,
+    borderWidth: 2,
+    borderColor: bold.black,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  inputInline: { flex: 1, fontSize: 15, color: colors.text, fontWeight: "500" },
-  footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
+  inputInline: { flex: 1, fontSize: 15, color: bold.black, fontWeight: "500" },
+  footer: { padding: 20, borderTopWidth: 1, borderTopColor: bold.black },
 });

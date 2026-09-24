@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Package, AlertTriangle, Trash2 } from "lucide-react-native";
 import { useMaterials } from "../context/MaterialContext";
 import { EmptyState } from "../components/EmptyState";
-import { colors, pastel } from "../theme/colors";
+import { bold, hardShadow } from "../theme/boldTheme";
 import { formatCurrency } from "../utils/formatters";
 import { Material } from "../types";
 
@@ -33,7 +33,7 @@ function MaterialRow({
       <View style={[styles.rowIcon, isLow && styles.rowIconLow]}>
         <Package
           size={18}
-          color={isLow ? colors.expense : pastel.pistachioDark}
+          color={isLow ? bold.red : bold.blue}
           strokeWidth={1.8}
         />
       </View>
@@ -47,7 +47,7 @@ function MaterialRow({
       <View style={styles.rowRight}>
         <View style={[styles.stockBadge, isLow && styles.stockBadgeLow]}>
           {isLow && (
-            <AlertTriangle size={11} color={colors.expense} strokeWidth={2.4} />
+            <AlertTriangle size={11} color={bold.red} strokeWidth={2.4} />
           )}
           <Text style={[styles.stockText, isLow && styles.stockTextLow]}>
             {material.stock} {material.unit}
@@ -58,7 +58,7 @@ function MaterialRow({
           onPress={onDelete}
           hitSlop={8}
         >
-          <Trash2 size={14} color={colors.textMuted} strokeWidth={2} />
+          <Trash2 size={14} color={bold.textMuted} strokeWidth={2} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -84,7 +84,7 @@ export function MaterialesTab() {
     <>
       {lowStockMaterials.length > 0 && (
         <View style={styles.lowStockBanner}>
-          <AlertTriangle size={15} color={colors.expense} strokeWidth={2.2} />
+          <AlertTriangle size={15} color={bold.red} strokeWidth={2.2} />
           <Text style={styles.lowStockText}>
             {lowStockMaterials.length === 1
               ? `"${lowStockMaterials[0].name}" tiene stock bajo`
@@ -110,8 +110,8 @@ export function MaterialesTab() {
         ListEmptyComponent={
           <EmptyState
             Icon={Package}
-            iconColor={pastel.pistachioDark}
-            iconBg={pastel.pistachioLight}
+            iconColor={bold.blue}
+            iconBg={bold.blueLight}
             title="Sin insumos todavía"
             subtitle="Registra tu stock de materiales, cajas, etiquetas, etc."
             ctaLabel="Agregar insumo"
@@ -127,63 +127,65 @@ const styles = StyleSheet.create({
   lowStockBanner: {
     marginHorizontal: 20,
     marginBottom: 12,
-    backgroundColor: colors.expenseLight,
+    backgroundColor: bold.redLight,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    borderWidth: 1,
-    borderColor: "#FECDD3",
+    borderWidth: 2,
+    borderColor: bold.black,
   },
   lowStockText: {
     fontSize: 12.5,
     fontWeight: "700",
-    color: colors.expenseOnDark ?? colors.expense,
+    color: bold.red,
   },
   list: { paddingHorizontal: 20, paddingBottom: 130 },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2.5,
+    borderColor: bold.black,
     paddingHorizontal: 14,
     paddingVertical: 12,
     gap: 12,
     marginBottom: 10,
+    ...hardShadow(3),
   },
   rowIcon: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: pastel.pistachioLight,
+    backgroundColor: bold.blueLight,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: bold.black,
   },
-  rowIconLow: { backgroundColor: colors.expenseLight },
+  rowIconLow: { backgroundColor: bold.redLight },
   rowInfo: { flex: 1 },
-  rowName: { fontSize: 14, fontWeight: "700", color: colors.text },
-  rowHint: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  rowName: { fontSize: 14, fontWeight: "700", color: bold.black },
+  rowHint: { fontSize: 12, color: bold.textSecondary, marginTop: 2 },
   rowRight: { alignItems: "flex-end", gap: 6 },
   stockBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderColor: bold.black,
   },
   stockBadgeLow: {
-    backgroundColor: colors.expenseLight,
-    borderColor: "#FECDD3",
+    backgroundColor: bold.redLight,
   },
-  stockText: { fontSize: 12, color: colors.textMuted, fontWeight: "700" },
-  stockTextLow: { color: colors.expense },
+  stockText: { fontSize: 12, color: bold.textMuted, fontWeight: "700" },
+  stockTextLow: { color: bold.red },
   deleteBtn: { padding: 2 },
 });

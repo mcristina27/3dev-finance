@@ -18,10 +18,12 @@ import { useTransactions } from "../context/TransactionContext";
 import { ModalHeader } from "../components/ModalHeader";
 import { GradientButton } from "../components/GradientButton";
 import { LabeledInput, FormField } from "../components/FormField";
-import { colors, primaryGradient } from "../theme/colors";
+import { colors, pastel } from "../theme/colors";
 import { TransactionType } from "../types";
 
-const EXPENSE_GRADIENT: readonly [string, string] = ["#F43F5E", "#BE123C"];
+// Tonos más profundos para que el texto blanco del botón sea legible
+const INCOME_GRADIENT: readonly [string, string] = ["#B394B3", "#9B7A9B"];
+const EXPENSE_GRADIENT: readonly [string, string] = ["#E1903E", "#C07030"];
 
 export function NewTransactionScreen() {
   const navigation = useNavigation();
@@ -113,7 +115,7 @@ export function NewTransactionScreen() {
               >
                 <TrendingUp
                   size={15}
-                  color={type === "income" ? colors.income : colors.textMuted}
+                  color={type === "income" ? pastel.lilacDark : colors.textMuted}
                   strokeWidth={2}
                 />
                 <Text
@@ -134,7 +136,7 @@ export function NewTransactionScreen() {
               >
                 <TrendingDown
                   size={15}
-                  color={type === "expense" ? colors.expense : colors.textMuted}
+                  color={type === "expense" ? pastel.orangeDark : colors.textMuted}
                   strokeWidth={2}
                 />
                 <Text
@@ -162,7 +164,7 @@ export function NewTransactionScreen() {
                 label={isIncome ? "Monto recibido (S/)" : "Costo (S/)"}
                 inputStyle={[
                   styles.amountInput,
-                  { color: isIncome ? colors.income : colors.expense },
+                  { color: isIncome ? pastel.lilacDark : pastel.orangeDark },
                 ]}
                 placeholder="0.00"
                 value={amount}
@@ -224,8 +226,8 @@ export function NewTransactionScreen() {
               label="Guardar registro"
               loading={saving}
               onPress={handleSave}
-              colorsRange={isIncome ? primaryGradient : EXPENSE_GRADIENT}
-              shadowColor={isIncome ? colors.primary : EXPENSE_GRADIENT[1]}
+              colorsRange={isIncome ? INCOME_GRADIENT : EXPENSE_GRADIENT}
+              shadowColor={isIncome ? pastel.lilacDark : pastel.orangeDark}
             />
           </View>
         </KeyboardAvoidingView>
@@ -258,8 +260,8 @@ const styles = StyleSheet.create({
   typeBtnIncome: { backgroundColor: colors.incomeLight },
   typeBtnExpense: { backgroundColor: colors.expenseLight },
   typeBtnText: { fontSize: 14, color: colors.textMuted, fontWeight: "600" },
-  typeBtnTextIncome: { color: colors.income },
-  typeBtnTextExpense: { color: colors.expense },
+  typeBtnTextIncome: { color: pastel.lilacDark },
+  typeBtnTextExpense: { color: pastel.orangeDark },
   form: { paddingHorizontal: 20, gap: 16, paddingBottom: 20 },
   amountInput: { fontSize: 28, fontWeight: "800", textAlign: "center" },
   notesInput: { height: 80, textAlignVertical: "top" },

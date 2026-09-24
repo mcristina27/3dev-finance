@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Plus } from "lucide-react-native";
-import { colors } from "../theme/colors";
+import { bold, hardShadow } from "../theme/boldTheme";
 
 /**
  * Header estándar de las pantallas de lista (Pedidos, Agenda, Inventario):
@@ -26,21 +26,18 @@ export function ScreenListHeader({
         <Text style={styles.title}>{title}</Text>
         {count != null && (
           <View style={[styles.badge, { backgroundColor: accentBg }]}>
-            <Text style={[styles.badgeText, { color: accentColor }]}>
+            <Text style={[styles.badgeText, { color: bold.black }]}>
               {count}
             </Text>
           </View>
         )}
       </View>
       <TouchableOpacity
-        style={[
-          styles.addBtn,
-          { backgroundColor: accentColor, shadowColor: accentColor },
-        ]}
+        style={[styles.addBtn, { backgroundColor: accentColor }]}
         onPress={onAddPress}
         activeOpacity={0.8}
       >
-        <Plus size={18} color={colors.white} strokeWidth={2.6} />
+        <Plus size={18} color={bold.black} strokeWidth={2.8} />
       </TouchableOpacity>
     </View>
   );
@@ -58,27 +55,26 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   title: {
     fontSize: 26,
-    fontWeight: "800",
-    color: colors.text,
+    fontWeight: "900",
+    color: bold.black,
     letterSpacing: -0.5,
   },
   badge: {
     borderRadius: 100,
     paddingHorizontal: 10,
     paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 2,
+    borderColor: bold.black,
   },
-  badgeText: { fontSize: 12, fontWeight: "700" },
+  badgeText: { fontSize: 12, fontWeight: "800" },
   addBtn: {
     width: 38,
     height: 38,
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 2.5,
+    borderColor: bold.black,
+    ...hardShadow(3),
   },
 });

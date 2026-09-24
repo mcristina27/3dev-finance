@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { X } from "lucide-react-native";
-import { colors } from "../theme/colors";
+import { bold } from "../theme/boldTheme";
 
 /**
  * Header estándar de las pantallas modal (Nuevo pedido, Nuevo insumo, etc.):
@@ -23,7 +23,7 @@ export function ModalHeader({
         onPress={onClose ?? (() => navigation.goBack())}
         style={styles.closeBtn}
       >
-        <X size={18} color={colors.textSecondary} strokeWidth={2.2} />
+        <X size={18} color={bold.black} strokeWidth={2.6} />
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
       <View style={{ width: 36 }} />
@@ -38,18 +38,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomWidth: 2.5,
+    borderBottomColor: bold.black,
   },
   closeBtn: {
     width: 36,
     height: 36,
     borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.surface,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 2,
+    borderColor: bold.black,
   },
-  headerTitle: { fontSize: 16, fontWeight: "700", color: colors.text },
+  headerTitle: { fontSize: 16, fontWeight: "800", color: bold.black },
 });

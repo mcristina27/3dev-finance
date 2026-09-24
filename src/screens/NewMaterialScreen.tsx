@@ -15,7 +15,7 @@ import { useMaterials } from "../context/MaterialContext";
 import { ModalHeader } from "../components/ModalHeader";
 import { GradientButton } from "../components/GradientButton";
 import { FormField, LabeledInput } from "../components/FormField";
-import { colors, pastel } from "../theme/colors";
+import { bold } from "../theme/boldTheme";
 import { MaterialUnit } from "../types";
 
 const UNITS: MaterialUnit[] = ["g", "kg", "ml", "l", "unidad", "metro", "cm"];
@@ -191,8 +191,8 @@ export function NewMaterialScreen() {
               label="Guardar insumo"
               loading={saving}
               onPress={handleSave}
-              colorsRange={[pastel.pistachio, pastel.pistachioDark]}
-              shadowColor={pastel.pistachioDark}
+              colorsRange={[bold.blue, bold.blue]}
+              shadowColor={bold.blue}
             />
           </View>
         </KeyboardAvoidingView>
@@ -202,7 +202,7 @@ export function NewMaterialScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: bold.bg },
   scroll: { flex: 1 },
   form: { paddingHorizontal: 20, paddingTop: 20, gap: 16, paddingBottom: 20 },
   row2: { flexDirection: "row", gap: 12 },
@@ -212,15 +212,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
   },
   unitChipActive: {
-    backgroundColor: pastel.pistachioLight,
-    borderColor: pastel.pistachioDark,
+    backgroundColor: bold.blueLight,
+    borderColor: bold.black,
   },
-  unitChipText: { fontSize: 13, fontWeight: "600", color: colors.textMuted },
-  unitChipTextActive: { color: pastel.pistachioDark, fontWeight: "700" },
-  footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
+  unitChipText: { fontSize: 13, fontWeight: "600", color: bold.textMuted },
+  unitChipTextActive: { color: bold.blue, fontWeight: "700" },
+  footer: { padding: 20, borderTopWidth: 1, borderTopColor: bold.black },
 });

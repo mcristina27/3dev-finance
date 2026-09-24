@@ -33,7 +33,7 @@ import { DateField } from "../components/DateField";
 import { ModalHeader } from "../components/ModalHeader";
 import { GradientButton } from "../components/GradientButton";
 import { FormField, LabeledInput } from "../components/FormField";
-import { colors, pastel } from "../theme/colors";
+import { bold } from "../theme/boldTheme";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import { ActivityType, ActivityItem, CatalogProduct } from "../types";
 
@@ -48,29 +48,25 @@ const STATUS_TOGGLES: {
   key: ToggleKey;
   label: string;
   activeBg: string;
-  activeBorder: string;
   activeText: string;
 }[] = [
   {
     key: "confirmed",
     label: "Confirmado",
-    activeBg: pastel.blueLight,
-    activeBorder: pastel.blueDark,
-    activeText: pastel.blueDark,
+    activeBg: bold.blueLight,
+    activeText: bold.black,
   },
   {
     key: "paid",
     label: "Pagado",
-    activeBg: pastel.pistachioLight,
-    activeBorder: pastel.pistachioDark,
-    activeText: pastel.pistachioDark,
+    activeBg: bold.mintLight,
+    activeText: bold.black,
   },
   {
     key: "delivered",
     label: "Entregado",
-    activeBg: pastel.berryLight,
-    activeBorder: pastel.berryDark,
-    activeText: pastel.berryDark,
+    activeBg: bold.pinkLight,
+    activeText: bold.black,
   },
 ];
 
@@ -300,7 +296,7 @@ export function NewActivityScreen() {
                 >
                   <t.Icon
                     size={15}
-                    color={type === t.key ? pastel.blueDark : colors.textMuted}
+                    color={type === t.key ? bold.pink : bold.textMuted}
                     strokeWidth={2}
                   />
                   <Text
@@ -359,8 +355,8 @@ export function NewActivityScreen() {
                               size={12}
                               color={
                                 eventId === ev.id
-                                  ? pastel.blueDark
-                                  : colors.textMuted
+                                  ? bold.pink
+                                  : bold.textMuted
                               }
                               strokeWidth={2}
                             />
@@ -397,7 +393,7 @@ export function NewActivityScreen() {
                           styles.statusChip,
                           active && {
                             backgroundColor: s.activeBg,
-                            borderColor: s.activeBorder,
+                            borderColor: bold.black,
                           },
                         ]}
                         onPress={() => toggleStatus(s.key)}
@@ -431,7 +427,7 @@ export function NewActivityScreen() {
                   >
                     <RefreshCw
                       size={13}
-                      color={pastel.blueDark}
+                      color={bold.pink}
                       strokeWidth={2.2}
                       style={refreshing ? { opacity: 0.4 } : undefined}
                     />
@@ -440,11 +436,11 @@ export function NewActivityScreen() {
                 </View>
 
                 <View style={styles.searchBox}>
-                  <Search size={15} color={colors.textMuted} strokeWidth={2} />
+                  <Search size={15} color={bold.textMuted} strokeWidth={2} />
                   <TextInput
                     style={styles.searchInput}
                     placeholder="Buscar en tu catálogo..."
-                    placeholderTextColor={colors.textMuted}
+                    placeholderTextColor={bold.textMuted}
                     value={search}
                     onChangeText={setSearch}
                   />
@@ -452,7 +448,7 @@ export function NewActivityScreen() {
 
                 {catalogState === "loading" && (
                   <View style={styles.catalogStatus}>
-                    <ActivityIndicator color={pastel.blueDark} />
+                    <ActivityIndicator color={bold.pink} />
                     <Text style={styles.catalogStatusText}>
                       Cargando catálogo...
                     </Text>
@@ -462,7 +458,7 @@ export function NewActivityScreen() {
                   <View style={styles.catalogStatus}>
                     <WifiOff
                       size={16}
-                      color={colors.textMuted}
+                      color={bold.textMuted}
                       strokeWidth={2}
                     />
                     <Text style={styles.catalogStatusText}>
@@ -497,7 +493,7 @@ export function NewActivityScreen() {
                               styles.productImgFallback,
                             ]}
                           >
-                            <Package size={20} color={pastel.blueDark} />
+                            <Package size={20} color={bold.pink} />
                           </View>
                         )}
                         <Text style={styles.productName} numberOfLines={2}>
@@ -522,7 +518,7 @@ export function NewActivityScreen() {
                   style={styles.addCustomBtn}
                   onPress={addCustomItem}
                 >
-                  <Plus size={14} color={pastel.blueDark} strokeWidth={2.4} />
+                  <Plus size={14} color={bold.pink} strokeWidth={2.4} />
                   <Text style={styles.addCustomBtnText}>
                     Agregar ítem manual
                   </Text>
@@ -544,7 +540,7 @@ export function NewActivityScreen() {
                           >
                             <Package
                               size={12}
-                              color={pastel.blueDark}
+                              color={bold.pink}
                               strokeWidth={2}
                             />
                           </View>
@@ -558,7 +554,7 @@ export function NewActivityScreen() {
                           <TextInput
                             style={[styles.itemName, styles.itemNameInput]}
                             placeholder="Nombre del ítem"
-                            placeholderTextColor={colors.textMuted}
+                            placeholderTextColor={bold.textMuted}
                             value={item.name}
                             onChangeText={(v) => updateCustomItem(i, "name", v)}
                           />
@@ -571,7 +567,7 @@ export function NewActivityScreen() {
                           >
                             <Minus
                               size={12}
-                              color={pastel.blueDark}
+                              color={bold.pink}
                               strokeWidth={2.5}
                             />
                           </TouchableOpacity>
@@ -588,7 +584,7 @@ export function NewActivityScreen() {
                           >
                             <Plus
                               size={12}
-                              color={pastel.blueDark}
+                              color={bold.pink}
                               strokeWidth={2.5}
                             />
                           </TouchableOpacity>
@@ -598,7 +594,7 @@ export function NewActivityScreen() {
                           <TextInput
                             style={styles.itemPriceInput}
                             placeholder="0.00"
-                            placeholderTextColor={colors.textMuted}
+                            placeholderTextColor={bold.textMuted}
                             keyboardType="decimal-pad"
                             value={item.unitPrice ? String(item.unitPrice) : ""}
                             onChangeText={(v) =>
@@ -616,7 +612,7 @@ export function NewActivityScreen() {
                         >
                           <X
                             size={14}
-                            color={colors.textMuted}
+                            color={bold.textMuted}
                             strokeWidth={2.2}
                           />
                         </TouchableOpacity>
@@ -656,8 +652,8 @@ export function NewActivityScreen() {
               label="Guardar"
               loading={saving}
               onPress={handleSave}
-              colorsRange={[pastel.blue, pastel.blueDark]}
-              shadowColor={pastel.blueDark}
+              colorsRange={[bold.pink, bold.pink]}
+              shadowColor={bold.pink}
             />
           </View>
         </KeyboardAvoidingView>
@@ -667,17 +663,17 @@ export function NewActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: bold.bg },
   scroll: { flex: 1 },
   typeToggle: {
     flexDirection: "row",
     margin: 20,
     gap: 8,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderRadius: 16,
     padding: 4,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
   },
   typeBtn: {
     flex: 1,
@@ -688,14 +684,14 @@ const styles = StyleSheet.create({
     gap: 6,
     borderRadius: 12,
   },
-  typeBtnActive: { backgroundColor: pastel.blueLight },
-  typeBtnText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
-  typeBtnTextActive: { color: pastel.blueDark, fontWeight: "700" },
+  typeBtnActive: { backgroundColor: bold.pinkLight },
+  typeBtnText: { fontSize: 13, color: bold.textMuted, fontWeight: "600" },
+  typeBtnTextActive: { color: bold.pink, fontWeight: "700" },
   form: { paddingHorizontal: 20, gap: 16, paddingBottom: 20 },
   field: { gap: 7 },
   label: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: bold.textSecondary,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.4,
@@ -709,7 +705,7 @@ const styles = StyleSheet.create({
   refreshBtnText: {
     fontSize: 11,
     fontWeight: "700",
-    color: pastel.blueDark,
+    color: bold.pink,
     textTransform: "none",
     letterSpacing: 0,
   },
@@ -719,14 +715,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
   },
   statusChipText: {
     fontSize: 12.5,
     fontWeight: "600",
-    color: colors.textMuted,
+    color: bold.textMuted,
   },
   eventChip: {
     flexDirection: "row",
@@ -735,45 +731,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 100,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     maxWidth: 220,
   },
   eventChipActive: {
-    backgroundColor: pastel.blueLight,
-    borderColor: pastel.blueDark,
+    backgroundColor: bold.pinkLight,
+    borderColor: bold.pink,
   },
-  eventChipText: { fontSize: 12, fontWeight: "600", color: colors.textMuted },
-  eventChipTextActive: { color: pastel.blueDark, fontWeight: "700" },
+  eventChipText: { fontSize: 12, fontWeight: "600", color: bold.textMuted },
+  eventChipTextActive: { color: bold.pink, fontWeight: "700" },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginBottom: 10,
   },
-  searchInput: { flex: 1, fontSize: 14, color: colors.text },
+  searchInput: { flex: 1, fontSize: 14, color: bold.black },
   catalogStatus: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingVertical: 10,
   },
-  catalogStatusText: { fontSize: 12.5, color: colors.textSecondary },
+  catalogStatusText: { fontSize: 12.5, color: bold.textSecondary },
   catalogRow: { marginBottom: 12 },
   productCard: {
     width: 96,
     marginRight: 10,
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     padding: 8,
     gap: 4,
   },
@@ -781,23 +777,23 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 64,
     borderRadius: 10,
-    backgroundColor: pastel.blueLight,
+    backgroundColor: bold.pinkLight,
   },
   productImgFallback: { alignItems: "center", justifyContent: "center" },
   productName: {
     fontSize: 11,
     fontWeight: "700",
-    color: colors.text,
+    color: bold.black,
     minHeight: 28,
   },
-  productPrice: { fontSize: 11, fontWeight: "700", color: pastel.blueDark },
+  productPrice: { fontSize: 11, fontWeight: "700", color: bold.pink },
   addCustomBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
     borderWidth: 1.5,
-    borderColor: pastel.blueDark,
+    borderColor: bold.pink,
     borderStyle: "dashed",
     borderRadius: 12,
     paddingVertical: 10,
@@ -806,13 +802,13 @@ const styles = StyleSheet.create({
   addCustomBtnText: {
     fontSize: 12.5,
     fontWeight: "700",
-    color: pastel.blueDark,
+    color: bold.pink,
   },
   itemsList: {
-    backgroundColor: colors.surface,
+    backgroundColor: bold.surface,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: bold.black,
     padding: 10,
     gap: 10,
   },
@@ -821,31 +817,31 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: pastel.blueLight,
+    backgroundColor: bold.pinkLight,
   },
   itemThumbFallback: { alignItems: "center", justifyContent: "center" },
-  itemName: { flex: 1, fontSize: 12.5, fontWeight: "600", color: colors.text },
+  itemName: { flex: 1, fontSize: 12.5, fontWeight: "600", color: bold.black },
   itemNameInput: {
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: bold.black,
   },
   qtyStepper: { flexDirection: "row", alignItems: "center", gap: 6 },
   qtyBtn: {
     width: 22,
     height: 22,
     borderRadius: 8,
-    backgroundColor: pastel.blueLight,
+    backgroundColor: bold.pinkLight,
     alignItems: "center",
     justifyContent: "center",
   },
   qtyInput: {
     fontSize: 12.5,
     fontWeight: "700",
-    color: colors.text,
+    color: bold.black,
     minWidth: 28,
     textAlign: "center",
     paddingVertical: 2,
@@ -853,20 +849,20 @@ const styles = StyleSheet.create({
   itemPriceInput: {
     width: 64,
     fontSize: 12.5,
-    color: colors.text,
+    color: bold.black,
     fontWeight: "600",
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: bold.black,
     textAlign: "right",
   },
   itemSubtotal: {
     fontSize: 12.5,
     fontWeight: "700",
-    color: colors.text,
+    color: bold.black,
     minWidth: 56,
     textAlign: "right",
   },
@@ -876,9 +872,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
+    borderTopColor: bold.black,
   },
-  totalLabel: { fontSize: 13, fontWeight: "700", color: colors.text },
-  totalValue: { fontSize: 17, fontWeight: "800", color: pastel.blueDark },
-  footer: { padding: 20, borderTopWidth: 1, borderTopColor: colors.border },
+  totalLabel: { fontSize: 13, fontWeight: "700", color: bold.black },
+  totalValue: { fontSize: 17, fontWeight: "800", color: bold.pink },
+  footer: { padding: 20, borderTopWidth: 1, borderTopColor: bold.black },
 });

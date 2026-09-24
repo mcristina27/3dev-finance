@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { View, Text, StyleSheet, TextInput, TextInputProps } from "react-native";
-import { colors } from "../theme/colors";
+import { bold } from "../theme/boldTheme";
 
 /**
  * Wrapper de "etiqueta + contenido" usado en casi todos los formularios
@@ -38,7 +38,7 @@ export function LabeledInput({
     <FormField label={label} style={style}>
       <TextInput
         style={[styles.input, inputStyle]}
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={bold.textMuted}
         {...inputProps}
       />
     </FormField>
@@ -49,20 +49,20 @@ const styles = StyleSheet.create({
   field: { gap: 7 },
   label: {
     fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: "700",
+    color: bold.black,
+    fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    backgroundColor: bold.surface,
+    borderWidth: 2,
+    borderColor: bold.black,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
-    fontWeight: "500",
+    color: bold.black,
+    fontWeight: "600",
   },
 });

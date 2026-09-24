@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { ScreenListHeader } from "../components/ScreenListHeader";
-import { colors, pastel } from "../theme/colors";
+import { bold } from "../theme/boldTheme";
 import { StockTab } from "./StockTab";
 import { MaterialesTab } from "./MaterialesTab";
 
@@ -26,8 +26,8 @@ export function InsumosScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <ScreenListHeader
           title="Inventario"
-          accentColor={pastel.pistachioDark}
-          accentBg={pastel.pistachioLight}
+          accentColor={bold.blue}
+          accentBg={bold.blueLight}
           onAddPress={handleAddPress}
         />
 
@@ -73,17 +73,17 @@ export function InsumosScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: bold.bg },
   segmented: {
     flexDirection: "row",
     gap: 8,
     marginHorizontal: 20,
     marginBottom: 14,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: bold.bg,
     borderRadius: 14,
     padding: 4,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2,
+    borderColor: bold.black,
   },
   segmentBtn: {
     flex: 1,
@@ -91,7 +91,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  segmentBtnActive: { backgroundColor: pastel.pistachioLight },
-  segmentText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
-  segmentTextActive: { color: pastel.pistachioDark, fontWeight: "700" },
+  segmentBtnActive: {
+    backgroundColor: bold.blueLight,
+    borderWidth: 1.5,
+    borderColor: bold.black,
+  },
+  segmentText: { fontSize: 13, color: bold.textMuted, fontWeight: "600" },
+  segmentTextActive: { color: bold.blue, fontWeight: "700" },
 });

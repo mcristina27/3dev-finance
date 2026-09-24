@@ -13,7 +13,7 @@ import { FileText } from "lucide-react-native";
 import { useTransactions } from "../context/TransactionContext";
 import { TransactionCard } from "../components/TransactionCard";
 import { BackHeader } from "../components/BackHeader";
-import { colors } from "../theme/colors";
+import { colors, pastel } from "../theme/colors";
 import { EntryType } from "../types";
 
 type Filter = "all" | EntryType;
@@ -149,12 +149,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipIncome: { backgroundColor: colors.incomeLight, borderColor: "#A7F3D0" },
-  chipExpense: { backgroundColor: colors.expenseLight, borderColor: "#FECDD3" },
+  chipIncome: { backgroundColor: pastel.lilacLight, borderColor: pastel.lilac },
+  chipExpense: { backgroundColor: pastel.orangeLight, borderColor: pastel.orange },
   chipText: { fontSize: 13, fontWeight: "600", color: colors.textSecondary },
   chipTextActive: { color: colors.white },
-  chipTextIncome: { color: colors.income },
-  chipTextExpense: { color: colors.expense },
+  chipTextIncome: { color: pastel.lilacDark },
+  chipTextExpense: { color: pastel.orangeDark },
   list: { paddingHorizontal: 20, paddingBottom: 130 },
   emptyState: { alignItems: "center", paddingVertical: 60 },
   emptyIconWrap: {

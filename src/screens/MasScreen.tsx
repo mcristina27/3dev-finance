@@ -8,7 +8,7 @@ import {
   FolderOpen, Palette, Bell, User, ChevronRight, ArrowLeftRight,
 } from 'lucide-react-native';
 import { BackHeader } from '../components/BackHeader';
-import { colors, primaryGradient } from '../theme/colors';
+import { colors, pastel, fabGradient } from '../theme/colors';
 
 type LucideIcon = React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 
@@ -57,7 +57,7 @@ export function MasScreen() {
           <BackHeader title="Configuración" />
 
           {/* Perfil */}
-          <LinearGradient colors={primaryGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.profileCard}>
+          <LinearGradient colors={fabGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.profileCard}>
             <View style={styles.profileAvatar}>
               <User size={26} color={colors.white} strokeWidth={1.8} />
             </View>
@@ -73,35 +73,35 @@ export function MasScreen() {
               Icon={ArrowLeftRight}
               label="Movimientos"
               description="Todos tus ingresos y gastos"
-              accentColor={colors.income}
+              accentColor={pastel.blue}
               onPress={() => navigation.navigate('Movimientos')}
             />
           </View>
 
           <Text style={styles.sectionLabel}>Mi negocio</Text>
           <View style={styles.menuCard}>
-            <MenuItem Icon={Tag}              label="Categorías"       description="Personaliza tus categorías"   accentColor={colors.primary}  disabled />
-            <MenuItem Icon={Store}            label="Canales de venta" description="Feria, online, pedido, etc."  accentColor={colors.agenda}   disabled />
-            <MenuItem Icon={CircleDollarSign} label="Moneda y región"  description="S/ · Perú"                    accentColor={colors.income}   disabled />
+            <MenuItem Icon={Tag}              label="Categorías"       description="Personaliza tus categorías"   accentColor={pastel.berry}         disabled />
+            <MenuItem Icon={Store}            label="Canales de venta" description="Feria, online, pedido, etc."  accentColor={pastel.yellowDark}    disabled />
+            <MenuItem Icon={CircleDollarSign} label="Moneda y región"  description="S/ · Perú"                    accentColor={pastel.pistachioDark} disabled />
           </View>
 
           <Text style={styles.sectionLabel}>Datos</Text>
           <View style={styles.menuCard}>
-            <MenuItem Icon={Cloud}      label="Sincronización"   description="Firebase · pendiente"   accentColor="#0EA5E9" disabled />
-            <MenuItem Icon={Upload}     label="Exportar reporte" description="PDF / Excel"            accentColor={colors.income} disabled />
+            <MenuItem Icon={Cloud}      label="Sincronización"   description="Firebase · pendiente"   accentColor={pastel.blue}      disabled />
+            <MenuItem Icon={Upload}     label="Exportar reporte" description="PDF / Excel"            accentColor={pastel.lilacDark} disabled />
             <MenuItem
               Icon={FolderOpen}
               label="Respaldo local"
               description="Exporta o restaura tus datos"
-              accentColor={colors.agenda}
+              accentColor={pastel.orangeDark}
               onPress={() => navigation.navigate('Respaldo')}
             />
           </View>
 
           <Text style={styles.sectionLabel}>App</Text>
           <View style={styles.menuCard}>
-            <MenuItem Icon={Palette} label="Apariencia"     description="Tema y colores"            accentColor={colors.expense} disabled />
-            <MenuItem Icon={Bell}    label="Notificaciones" description="Alertas de stock y eventos" accentColor={colors.agenda}  disabled />
+            <MenuItem Icon={Palette} label="Apariencia"     description="Tema y colores"            accentColor={pastel.berry}      disabled />
+            <MenuItem Icon={Bell}    label="Notificaciones" description="Alertas de stock y eventos" accentColor={pastel.yellowDark} disabled />
           </View>
 
           <Text style={styles.version}>Antiva v0.1.0 · hecho con amor en Perú 🇵🇪</Text>

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Plus } from "lucide-react-native";
-import { colors } from "../theme/colors";
+import { bold, hardShadow } from "../theme/boldTheme";
 
 type LucideIcon = React.ComponentType<{
   size: number;
@@ -36,7 +36,7 @@ export function EmptyState({
   return (
     <View style={styles.emptyState}>
       <View style={[styles.emptyIconWrap, { backgroundColor: iconBg }]}>
-        <Icon size={32} color={iconColor} strokeWidth={1.5} />
+        <Icon size={32} color={bold.black} strokeWidth={1.8} />
       </View>
       <Text style={styles.emptyText}>{title}</Text>
       <Text style={styles.emptySubtext}>{subtitle}</Text>
@@ -46,7 +46,7 @@ export function EmptyState({
           onPress={onCtaPress}
           activeOpacity={0.85}
         >
-          <Plus size={15} color={colors.white} strokeWidth={2.6} />
+          <Plus size={15} color={bold.black} strokeWidth={2.8} />
           <Text style={styles.emptyCtaText}>{ctaLabel}</Text>
         </TouchableOpacity>
       )}
@@ -67,18 +67,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    borderWidth: 2.5,
+    borderColor: bold.black,
   },
   emptyText: {
     fontSize: 16,
-    fontWeight: "700",
-    color: colors.text,
+    fontWeight: "800",
+    color: bold.black,
     marginBottom: 4,
   },
   emptySubtext: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: bold.textSecondary,
     textAlign: "center",
     marginBottom: 18,
   },
@@ -89,6 +89,9 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingHorizontal: 20,
     paddingVertical: 12,
+    borderWidth: 2.5,
+    borderColor: bold.black,
+    ...hardShadow(3),
   },
-  emptyCtaText: { color: colors.white, fontSize: 14, fontWeight: "700" },
+  emptyCtaText: { color: bold.black, fontSize: 14, fontWeight: "800" },
 });
