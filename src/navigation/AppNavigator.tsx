@@ -17,8 +17,6 @@ import { NewAgendaEventScreen } from '../screens/NewAgendaEventScreen';
 import { AdjustStockScreen } from '../screens/AdjustStockScreen';
 import { BackupScreen } from '../screens/BackupScreen';
 import { LoginScreen } from '../screens/LoginScreen';
-import { SignUpScreen } from '../screens/SignUpScreen';
-import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 import { useAuth } from '../context/AuthContext';
 import { bold, hardShadow } from '../theme/boldTheme';
 
@@ -108,8 +106,6 @@ function AuthNavigator() {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Registro" component={SignUpScreen} />
-      <AuthStack.Screen name="RecuperarContrasena" component={ForgotPasswordScreen} />
     </AuthStack.Navigator>
   );
 }
