@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, Platform, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as AppleAuthentication from "expo-apple-authentication";
 import { TouchableOpacity } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { GoogleIcon } from "../components/GoogleIcon";
@@ -68,13 +67,14 @@ export function LoginScreen() {
           </TouchableOpacity>
 
           {Platform.OS === "ios" && (
-            <AppleAuthentication.AppleAuthenticationButton
-              buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
-              buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE}
-              cornerRadius={100}
-              style={styles.appleBtn}
+            <TouchableOpacity
+              style={[styles.oauthBtn, boldBorder]}
               onPress={handleApple}
-            />
+              activeOpacity={0.85}
+            >
+              <Text style={styles.appleGlyph}></Text>
+              <Text style={styles.oauthText}>Continuar con Apple</Text>
+            </TouchableOpacity>
           )}
         </View>
       </View>
@@ -112,5 +112,5 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   oauthText: { fontSize: 16, fontWeight: "700", color: bold.black },
-  appleBtn: { height: 56, width: "100%" },
+  appleGlyph: { fontSize: 20, color: bold.black, marginTop: -2 },
 });
