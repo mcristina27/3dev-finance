@@ -3,12 +3,14 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 import {
   Tag, Store, CircleDollarSign, Cloud, Upload,
-  FolderOpen, Palette, Bell, User, ChevronRight, ArrowLeftRight,
+  FolderOpen, Palette, Bell, User, ChevronRight, ArrowLeftRight, LogOut,
 } from 'lucide-react-native';
 import { BackHeader } from '../components/BackHeader';
 import { colors, pastel, fabGradient } from '../theme/colors';
+import { Alert } from 'react-native';
 
 type LucideIcon = React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 
@@ -48,6 +50,14 @@ function MenuItem({ Icon, label, description, accentColor, onPress, disabled }: 
 
 export function MasScreen() {
   const navigation = useNavigation<any>();
+  const { session, signOut } = useAuth();
+
+  function handleSignOut() {
+    Alert.alert('Cerrar sesión', '¿Seguro que quieres salir?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Cerrar sesión', style: 'destructive', onPress: () => signOut() },
+    ]);
+  }
 
   return (
     <View style={styles.root}>
@@ -62,8 +72,8 @@ export function MasScreen() {
               <User size={26} color={colors.white} strokeWidth={1.8} />
             </View>
             <View>
-              <Text style={styles.profileName}>Cristina Ruelas</Text>
-              <Text style={styles.profileBiz}>3Dev · Impresiones 3D</Text>
+              <Text style={styles.profileName}>3Dev · Impresiones 3D</Text>
+              <Text style={styles.profileBiz}>{session?.user?.email ?? ''}</Text>
             </View>
           </LinearGradient>
 
@@ -87,7 +97,7 @@ export function MasScreen() {
 
           <Text style={styles.sectionLabel}>Datos</Text>
           <View style={styles.menuCard}>
-            <MenuItem Icon={Cloud}      label="Sincronización"   description="Firebase · pendiente"   accentColor={pastel.blue}      disabled />
+            <MenuItem Icon={Cloud}      label="Sincronización"   description="Supabase · próximamente" accentColor={pastel.blue}      disabled />
             <MenuItem Icon={Upload}     label="Exportar reporte" description="PDF / Excel"            accentColor={pastel.lilacDark} disabled />
             <MenuItem
               Icon={FolderOpen}
@@ -102,6 +112,17 @@ export function MasScreen() {
           <View style={styles.menuCard}>
             <MenuItem Icon={Palette} label="Apariencia"     description="Tema y colores"            accentColor={pastel.berry}      disabled />
             <MenuItem Icon={Bell}    label="Notificaciones" description="Alertas de stock y eventos" accentColor={pastel.yellowDark} disabled />
+          </View>
+
+          <Text style={styles.sectionLabel}>Cuenta</Text>
+          <View style={styles.menuCard}>
+            <MenuItem
+              Icon={LogOut}
+              label="Cerrar sesión"
+              description={session?.user?.email ?? ''}
+              accentColor={pastel.berry}
+              onPress={handleSignOut}
+            />
           </View>
 
           <Text style={styles.version}>Antiva v0.1.0 · hecho con amor en Perú 🇵🇪</Text>
