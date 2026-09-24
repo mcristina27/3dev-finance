@@ -61,7 +61,7 @@ export const colors = {
   agendaLight: pastel.yellowLight,
 
   // Fondos — crema cálido de la paleta
-  background: "#F5ECE5",
+  background: "#FBF2E4", // mismo tono cálido que theme/boldTheme.ts (bold.bg)
   surface: "#FFFDF9",
   surfaceAlt: "#F7F2EE",
 

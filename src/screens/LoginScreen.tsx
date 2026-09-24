@@ -51,6 +51,8 @@ export function LoginScreen() {
           <Text style={styles.subtitle}>Finanzas de 3Dev, en un solo lugar</Text>
         </View>
 
+        <View style={{ flex: 1 }} />
+
         <View style={styles.buttons}>
           <TouchableOpacity
             style={[styles.oauthBtn, boldBorder, hardShadow(4), loadingGoogle && { opacity: 0.65 }]}
@@ -83,19 +85,18 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 28,
+    paddingTop: 48,
     paddingBottom: 32,
-    justifyContent: "center",
-    gap: 36,
   },
   illustrationWrap: {
     alignItems: "center",
     justifyContent: "center",
   },
   illustration: {
-    width: "80%",
-    aspectRatio: 1,
+    width: 220,
+    height: 220,
   },
-  textWrap: { alignItems: "center", gap: 6 },
+  textWrap: { alignItems: "center", gap: 6, marginTop: 28 },
   title: { fontSize: 28, fontWeight: "900", color: bold.black },
   subtitle: { fontSize: 14, color: bold.textSecondary, fontWeight: "600", textAlign: "center" },
   buttons: { gap: 12 },
