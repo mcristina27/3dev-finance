@@ -4,7 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { TouchableOpacity } from "react-native";
 import { useAuth } from "../context/AuthContext";
-import { bold, boldBorder, hardShadow } from "../theme/boldTheme";
+import { GoogleIcon } from "../components/GoogleIcon";
+import { bold, boldBorder } from "../theme/boldTheme";
 
 /**
  * Login simple: solo Google y Apple. La ilustración es un placeholder en
@@ -55,11 +56,12 @@ export function LoginScreen() {
 
         <View style={styles.buttons}>
           <TouchableOpacity
-            style={[styles.oauthBtn, boldBorder, hardShadow(4), loadingGoogle && { opacity: 0.65 }]}
+            style={[styles.oauthBtn, boldBorder, loadingGoogle && { opacity: 0.65 }]}
             onPress={handleGoogle}
             activeOpacity={0.85}
             disabled={loadingGoogle}
           >
+            <GoogleIcon size={20} />
             <Text style={styles.oauthText}>
               {loadingGoogle ? "Ingresando..." : "Continuar con Google"}
             </Text>
@@ -68,7 +70,7 @@ export function LoginScreen() {
           {Platform.OS === "ios" && (
             <AppleAuthentication.AppleAuthenticationButton
               buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
-              buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+              buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE}
               cornerRadius={100}
               style={styles.appleBtn}
               onPress={handleApple}
@@ -103,10 +105,12 @@ const styles = StyleSheet.create({
   oauthBtn: {
     height: 56,
     borderRadius: 100,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: bold.surface,
+    gap: 10,
+    backgroundColor: "transparent",
   },
-  oauthText: { fontSize: 16, fontWeight: "800", color: bold.black },
+  oauthText: { fontSize: 16, fontWeight: "700", color: bold.black },
   appleBtn: { height: 56, width: "100%" },
 });
