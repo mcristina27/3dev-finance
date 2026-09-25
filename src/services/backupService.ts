@@ -44,7 +44,7 @@ export async function buildBackupString(): Promise<string> {
   return JSON.stringify(payload);
 }
 
-/** Valida (sin escribir nada todavía) que el texto pegado sea un respaldo de Antiva. */
+/** Valida (sin escribir nada todavía) que el texto pegado sea un respaldo de 3Dev Finance. */
 export function parseBackupString(raw: string): BackupPayload {
   let parsed: unknown;
   try {
@@ -56,7 +56,7 @@ export function parseBackupString(raw: string): BackupPayload {
   }
   const payload = parsed as Partial<BackupPayload>;
   if (!payload || payload.app !== BACKUP_APP_ID || typeof payload.data !== "object") {
-    throw new Error("Ese texto no parece ser un respaldo de Antiva.");
+    throw new Error("Ese texto no parece ser un respaldo de 3Dev Finance.");
   }
   return payload as BackupPayload;
 }

@@ -47,7 +47,7 @@ export function LoginScreen() {
         </View>
 
         <View style={styles.textWrap}>
-          <Text style={styles.title}>Antiva</Text>
+          <Text style={styles.title}>3Dev Finance</Text>
           <Text style={styles.subtitle}>Finanzas de 3Dev, en un solo lugar</Text>
         </View>
 

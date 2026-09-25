@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("Falta EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID en el .env");
     }
 
-    const redirectUri = AuthSession.makeRedirectUri({ scheme: "antiva" });
+    const redirectUri = AuthSession.makeRedirectUri({ scheme: "3devfinance" });
     const request = new AuthSession.AuthRequest({
       clientId,
       scopes: ["openid", "email", "profile"],

@@ -36,7 +36,7 @@ export function BackupScreen() {
       const json = await buildBackupString();
       await Share.share({
         message: json,
-        title: "Respaldo Antiva",
+        title: "Respaldo 3Dev Finance",
       });
     } catch {
       Alert.alert(

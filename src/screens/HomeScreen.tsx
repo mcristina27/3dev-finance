@@ -50,7 +50,7 @@ export function HomeScreen() {
           <View style={styles.header}>
             <View>
               <Text style={styles.greeting}>¡Hola, Cristina! 👋</Text>
-              <Text style={styles.title}>Antiva</Text>
+              <Text style={styles.title}>3Dev Finance</Text>
             </View>
             <View style={styles.headerActions}>
               <TouchableOpacity

@@ -125,7 +125,7 @@ export function MasScreen() {
             />
           </View>
 
-          <Text style={styles.version}>Antiva v0.1.0 · hecho con amor en Perú 🇵🇪</Text>
+          <Text style={styles.version}>3Dev Finance v0.1.0 · hecho con amor en Perú 🇵🇪</Text>
 
         </ScrollView>
       </SafeAreaView>

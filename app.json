@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Antiva",
-    "slug": "antiva",
+    "name": "3Dev Finance",
+    "slug": "3dev-finance",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,6 +28,6 @@
       "expo-font",
       "expo-apple-authentication"
     ],
-    "scheme": "antiva"
+    "scheme": "3devfinance"
   }
 }

@@ -1,5 +1,5 @@
 // ─── Paleta "Bold" (estilo Foody: bordes negros, sombra dura, color plano) ────
-// Prueba de estilo para Antiva — rosa + amarillo del logo de 3Dev, con negro
+// Prueba de estilo para 3Dev Finance — rosa + amarillo del logo de 3Dev, con negro
 // en bordes/botones en vez de la paleta pastel actual.
 
 export const bold = {
