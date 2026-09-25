@@ -14,7 +14,7 @@ interface MaterialContextType {
 
 const MaterialContext = createContext<MaterialContextType | null>(null);
 
-const STORAGE_KEY = '@antiva_materials';
+const STORAGE_KEY = '@3devfinance_materials';
 
 export function MaterialProvider({ children }: { children: ReactNode }) {
   const [materials, setMaterials] = useState<Material[]>([]);

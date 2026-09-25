@@ -2,19 +2,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
  * Todo lo que consideramos "tus datos" — no incluye el cache del catálogo
- * remoto (@antiva_catalog_cache), porque eso se puede volver a jalar de
+ * remoto (@3devfinance_catalog_cache), porque eso se puede volver a jalar de
  * la web en cualquier momento.
  */
 export const BACKUP_KEYS = [
-  "@antiva_transactions",
-  "@antiva_materials",
-  "@antiva_activities",
-  "@antiva_agenda_events",
-  "@antiva_stock",
-  "@antiva_stock_history",
+  "@3devfinance_transactions",
+  "@3devfinance_materials",
+  "@3devfinance_activities",
+  "@3devfinance_agenda_events",
+  "@3devfinance_stock",
+  "@3devfinance_stock_history",
 ] as const;
 
-const BACKUP_APP_ID = "antiva";
+const BACKUP_APP_ID = "3devfinance";
 const BACKUP_VERSION = 1;
 
 export interface BackupPayload {
@@ -77,12 +77,12 @@ export async function restoreFromPayload(payload: BackupPayload): Promise<void> 
 export function summarizeBackup(payload: BackupPayload): string {
   const counts: string[] = [];
   const label: Record<string, string> = {
-    "@antiva_transactions": "movimientos",
-    "@antiva_materials": "insumos",
-    "@antiva_activities": "pedidos",
-    "@antiva_agenda_events": "eventos de agenda",
-    "@antiva_stock": "productos con stock",
-    "@antiva_stock_history": "movimientos de stock",
+    "@3devfinance_transactions": "movimientos",
+    "@3devfinance_materials": "insumos",
+    "@3devfinance_activities": "pedidos",
+    "@3devfinance_agenda_events": "eventos de agenda",
+    "@3devfinance_stock": "productos con stock",
+    "@3devfinance_stock_history": "movimientos de stock",
   };
   for (const key of BACKUP_KEYS) {
     const value = payload.data[key];

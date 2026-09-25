@@ -16,7 +16,7 @@ interface ActivityContextType {
 
 const ActivityContext = createContext<ActivityContextType | null>(null);
 
-const STORAGE_KEY = '@antiva_activities';
+const STORAGE_KEY = '@3devfinance_activities';
 
 /**
  * Un pedido/venta genera su ingreso en cuanto se marca "Pagado" — no depende

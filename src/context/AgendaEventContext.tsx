@@ -13,7 +13,7 @@ interface AgendaEventContextType {
 
 const AgendaEventContext = createContext<AgendaEventContextType | null>(null);
 
-const STORAGE_KEY = '@antiva_agenda_events';
+const STORAGE_KEY = '@3devfinance_agenda_events';
 
 export function AgendaEventProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<AgendaEvent[]>([]);

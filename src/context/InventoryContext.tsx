@@ -18,8 +18,8 @@ interface InventoryContextType {
 
 const InventoryContext = createContext<InventoryContextType | null>(null);
 
-const STORAGE_KEY = '@antiva_stock';
-const HISTORY_KEY = '@antiva_stock_history';
+const STORAGE_KEY = '@3devfinance_stock';
+const HISTORY_KEY = '@3devfinance_stock_history';
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [stockList, setStockList] = useState<ProductStock[]>([]);

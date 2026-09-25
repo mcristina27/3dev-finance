@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CatalogProduct } from "../types";
 
 const CATALOG_URL = "https://3devlabs.app/api/productos";
-const CACHE_KEY = "@antiva_catalog_cache";
+const CACHE_KEY = "@3devfinance_catalog_cache";
 const CACHE_TTL_MS = 1000 * 60 * 30; // 30 min
 
 interface CacheShape {
