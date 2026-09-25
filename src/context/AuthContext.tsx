@@ -48,44 +48,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   }
 
-  // Google: flujo OAuth vía navegador (expo-auth-session), pide el id_token
-  // y se lo pasa a Supabase con signInWithIdToken — no requiere el SDK nativo.
-  // Necesita EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID (OAuth client tipo "Web" de
-  // Google Cloud Console, el mismo que se registra como proveedor en
-  // Supabase > Authentication > Providers > Google).
+  // Google: Supabase arma la URL de autorización (usa el Client ID/Secret
+  // configurados en Supabase > Authentication > Providers > Google, la app
+  // no necesita saber cuáles son), la abrimos en el navegador del sistema y
+  // Supabase nos regresa a la app por el esquema "3devfinance://" con la
+  // sesión ya lista — no hace falta ningún client id en el .env.
   async function signInWithGoogle() {
     const AuthSession = await import("expo-auth-session");
     const WebBrowser = await import("expo-web-browser");
-    WebBrowser.maybeCompleteAuthSession();
 
-    const clientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
-    if (!clientId) {
-      throw new Error("Falta EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID en el .env");
-    }
+    const redirectTo = AuthSession.makeRedirectUri({ scheme: "3devfinance" });
 
-    const redirectUri = AuthSession.makeRedirectUri({ scheme: "3devfinance" });
-    const request = new AuthSession.AuthRequest({
-      clientId,
-      scopes: ["openid", "email", "profile"],
-      redirectUri,
-      responseType: AuthSession.ResponseType.IdToken,
-      extraParams: { nonce: Math.random().toString(36).slice(2) },
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo, skipBrowserRedirect: true },
     });
+    if (error) throw error;
+    if (!data?.url) throw new Error("No se pudo iniciar el flujo de Google");
 
-    const result = await request.promptAsync({
-      authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-    });
-
-    if (result.type !== "success" || !result.params.id_token) {
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+    if (result.type !== "success" || !result.url) {
       if (result.type === "cancel" || result.type === "dismiss") return;
       throw new Error("No se pudo iniciar sesión con Google");
     }
 
-    const { error } = await supabase.auth.signInWithIdToken({
-      provider: "google",
-      token: result.params.id_token,
-    });
-    if (error) throw error;
+    const url = new URL(result.url);
+    const raw = url.hash ? url.hash.slice(1) : url.search.slice(1);
+    const params = new URLSearchParams(raw);
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+    if (!access_token || !refresh_token) {
+      throw new Error("Google no devolvió la sesión esperada");
+    }
+
+    const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token });
+    if (sessionError) throw sessionError;
   }
 
   // Apple: botón nativo de Sign in with Apple (solo iOS). Requiere el
