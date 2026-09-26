@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const AuthSession = await import("expo-auth-session");
     const WebBrowser = await import("expo-web-browser");
 
-    const redirectTo = AuthSession.makeRedirectUri({ scheme: "3devfinance" });
+    const redirectTo = AuthSession.makeRedirectUri({ scheme: "3devfinance", native: "3devfinance://" });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
