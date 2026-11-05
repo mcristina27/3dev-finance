@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState, ReactNo
 import { Platform } from "react-native";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { migrateToSupabaseOnce } from "../services/migrateToSupabase";
 
 interface AuthContextType {
   session: Session | null;
@@ -21,13 +22,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    // Antes de exponer la sesión al resto de la app, corremos (una sola vez)
+    // la migración de los datos locales hacia Supabase, para que los contextos
+    // ya carguen los datos migrados. Si falla (p.ej. sin conexión) no bloquea
+    // el login y se reintenta en el próximo arranque.
+    async function applySession(next: Session | null) {
+      if (next?.user) {
+        try {
+          await migrateToSupabaseOnce(next.user.id);
+        } catch (e) {
+          console.warn("Migración a Supabase pendiente (se reintentará):", e);
+        }
+      }
+      setSession(next);
       setLoading(false);
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      applySession(data.session);
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
+      applySession(newSession);
     });
 
     return () => sub.subscription.unsubscribe();
