@@ -54,10 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Supabase nos regresa a la app por el esquema "3devfinance://" con la
   // sesión ya lista — no hace falta ningún client id en el .env.
   async function signInWithGoogle() {
-    const AuthSession = await import("expo-auth-session");
     const WebBrowser = await import("expo-web-browser");
 
-    const redirectTo = AuthSession.makeRedirectUri({ scheme: "3devfinance", native: "3devfinance://" });
+    // Path explícito ("auth-callback") para que calce con el patrón
+    // "3devfinance://**" de la allow-list de Supabase. Un esquema a secas
+    // ("3devfinance://") no calza y Supabase cae a su Site URL (localhost).
+    const redirectTo = "3devfinance://auth-callback";
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
