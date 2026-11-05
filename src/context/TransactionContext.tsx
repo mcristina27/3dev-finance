@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext';
 import { uuid } from '../lib/ids';
 import { txFromRow, txToRow } from '../lib/mappers';
 import { readCache, writeCache } from '../lib/cache';
+import { uploadReceiptPhotos, deleteReceiptPhotos } from '../services/receipts';
 
 interface TransactionContextType {
   transactions: Transaction[];
@@ -82,8 +83,14 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
 
   async function addTransaction(data: Omit<Transaction, 'id' | 'createdAt'>) {
     if (!userId) throw new Error('No hay sesión activa');
+    // Sube las fotos locales al bucket privado 'receipts' y guarda sus rutas.
+    const photos =
+      data.photos && data.photos.length
+        ? await uploadReceiptPhotos(userId, data.photos)
+        : data.photos;
     const tx: Transaction = {
       ...data,
+      photos,
       id: uuid(),
       createdAt: new Date().toISOString(),
     };
@@ -97,8 +104,11 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
 
   async function deleteTransaction(id: string) {
     if (!userId) throw new Error('No hay sesión activa');
+    const photos = transactions.find(t => t.id === id)?.photos;
     const { error } = await supabase.from('transactions').delete().eq('id', id);
     if (error) throw error;
+    // Limpia las fotos del bucket (best-effort, no bloquea el borrado).
+    deleteReceiptPhotos(photos);
     const list = transactions.filter(t => t.id !== id);
     setTransactions(list);
     writeCache(CACHE_KEY, list);
