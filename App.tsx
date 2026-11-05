@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { ConnectivityProvider } from './src/context/ConnectivityContext';
 import { AuthProvider } from './src/context/AuthContext';
 import { TransactionProvider } from './src/context/TransactionContext';
 import { MaterialProvider } from './src/context/MaterialContext';
@@ -28,7 +29,8 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
+    <ConnectivityProvider>
+      <AuthProvider>
       <TransactionProvider>
         <MaterialProvider>
           <InventoryProvider>
@@ -41,7 +43,8 @@ export default function App() {
           </InventoryProvider>
         </MaterialProvider>
       </TransactionProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ConnectivityProvider>
   );
 }
 

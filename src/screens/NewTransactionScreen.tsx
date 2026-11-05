@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { useConnectivity } from "../context/ConnectivityContext";
+import { isNetworkError } from "../lib/net";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -29,6 +31,7 @@ export function NewTransactionScreen() {
   const navigation = useNavigation();
   const route = useRoute<any>();
   const { addTransaction } = useTransactions();
+  const { showOffline } = useConnectivity();
 
   const [type, setType] = useState<TransactionType>(
     route.params?.defaultType ?? "income",
@@ -84,8 +87,9 @@ export function NewTransactionScreen() {
         photos: photos.length > 0 ? photos : undefined,
       });
       navigation.goBack();
-    } catch {
-      Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
+    } catch (err) {
+      if (isNetworkError(err)) showOffline();
+      else Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
     } finally {
       setSaving(false);
     }

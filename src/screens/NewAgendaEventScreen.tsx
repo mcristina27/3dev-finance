@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { useConnectivity } from "../context/ConnectivityContext";
+import { isNetworkError } from "../lib/net";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { MapPin } from "lucide-react-native";
@@ -26,6 +28,7 @@ export function NewAgendaEventScreen() {
   const route = useRoute<any>();
   const eventId = route.params?.eventId as string | undefined;
   const { getEvent, addEvent, updateEvent } = useAgendaEvents();
+  const { showOffline } = useConnectivity();
   const existing = eventId ? getEvent(eventId) : undefined;
   const isEditing = !!existing;
 
@@ -60,8 +63,9 @@ export function NewAgendaEventScreen() {
         await addEvent(payload);
       }
       navigation.goBack();
-    } catch {
-      Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
+    } catch (err) {
+      if (isNetworkError(err)) showOffline();
+      else Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
     } finally {
       setSaving(false);
     }

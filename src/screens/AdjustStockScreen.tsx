@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
+import { useConnectivity } from "../context/ConnectivityContext";
+import { isNetworkError } from "../lib/net";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -39,6 +41,7 @@ export function AdjustStockScreen() {
 
   const { getStock, adjustStock, setStock, getLastUpdated, getHistory } =
     useInventory();
+  const { showOffline } = useConnectivity();
 
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const [catalogState, setCatalogState] = useState<
@@ -114,8 +117,9 @@ export function AdjustStockScreen() {
         await setStock(String(selected.id), parsed, "manual");
       }
       navigation.goBack();
-    } catch {
-      Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
+    } catch (err) {
+      if (isNetworkError(err)) showOffline();
+      else Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
     } finally {
       setSaving(false);
     }

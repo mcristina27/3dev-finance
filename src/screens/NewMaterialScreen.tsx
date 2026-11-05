@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { useConnectivity } from "../context/ConnectivityContext";
+import { isNetworkError } from "../lib/net";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useMaterials } from "../context/MaterialContext";
@@ -25,6 +27,7 @@ export function NewMaterialScreen() {
   const route = useRoute<any>();
   const materialId = route.params?.materialId as string | undefined;
   const { getMaterial, addMaterial, updateMaterial } = useMaterials();
+  const { showOffline } = useConnectivity();
   const existing = materialId ? getMaterial(materialId) : undefined;
   const isEditing = !!existing;
 
@@ -88,8 +91,9 @@ export function NewMaterialScreen() {
         await addMaterial(payload);
       }
       navigation.goBack();
-    } catch {
-      Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
+    } catch (err) {
+      if (isNetworkError(err)) showOffline();
+      else Alert.alert("Error", "No se pudo guardar. Intenta de nuevo.");
     } finally {
       setSaving(false);
     }

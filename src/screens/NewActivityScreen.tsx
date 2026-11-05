@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
+import { useConnectivity } from "../context/ConnectivityContext";
+import { isNetworkError } from "../lib/net";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -75,6 +77,7 @@ export function NewActivityScreen() {
   const route = useRoute<any>();
   const activityId = route.params?.activityId as string | undefined;
   const { getActivity, addActivity, updateActivity } = useActivities();
+  const { showOffline } = useConnectivity();
   const { events } = useAgendaEvents();
   const existing = activityId ? getActivity(activityId) : undefined;
   const isEditing = !!existing;
@@ -258,11 +261,15 @@ export function NewActivityScreen() {
       }
       navigation.goBack();
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "No se pudo guardar. Intenta de nuevo.";
-      Alert.alert("Error", message);
+      if (isNetworkError(err)) {
+        showOffline();
+      } else {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "No se pudo guardar. Intenta de nuevo.";
+        Alert.alert("Error", message);
+      }
     } finally {
       setSaving(false);
     }
