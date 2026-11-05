@@ -146,7 +146,15 @@ export function NewActivityScreen() {
     [events],
   );
 
-  const orderTotal = items.reduce((sum, it) => sum + it.qty * it.unitPrice, 0);
+  // En venta de evento lo que cuenta es lo VENDIDO (qtySold); si aún no se
+  // ajustó, se asume que se vendió todo lo llevado (qty). En pedidos siempre
+  // es la cantidad del pedido.
+  const soldQtyOf = (it: ActivityItem) =>
+    type === "event_sale" ? it.qtySold ?? it.qty : it.qty;
+  const orderTotal = items.reduce(
+    (sum, it) => sum + soldQtyOf(it) * it.unitPrice,
+    0,
+  );
 
   function toggleStatus(key: ToggleKey) {
     if (key === "confirmed") setConfirmed((v) => !v);
@@ -197,6 +205,16 @@ export function NewActivityScreen() {
     });
   }
 
+  // Venta de evento: cuántas unidades se vendieron realmente de este ítem.
+  function setSoldDirect(index: number, value: string) {
+    const parsed = parseInt(value.replace(/[^0-9]/g, ""), 10);
+    setItems((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], qtySold: isNaN(parsed) ? 0 : parsed };
+      return next;
+    });
+  }
+
   function removeItem(index: number) {
     setItems((prev) => prev.filter((_, i) => i !== index));
   }
@@ -239,6 +257,13 @@ export function NewActivityScreen() {
 
     setSaving(true);
     try {
+      // En venta de evento guardamos qtySold (lo vendido) para que el stock se
+      // descuente por lo realmente vendido; en pedido no aplica.
+      const finalItems =
+        type === "event_sale"
+          ? items.map((it) => ({ ...it, qtySold: it.qtySold ?? it.qty }))
+          : items.map((it) => ({ ...it, qtySold: undefined }));
+
       const payload = {
         type,
         title: title.trim(),
@@ -246,7 +271,7 @@ export function NewActivityScreen() {
         confirmed,
         paid,
         delivered,
-        items,
+        items: finalItems,
         totalAmount: orderTotal,
         notes: notes.trim() || undefined,
         channel: channel.trim() || undefined,
@@ -534,6 +559,12 @@ export function NewActivityScreen() {
                 {/* Items seleccionados */}
                 {items.length > 0 && (
                   <View style={styles.itemsList}>
+                    {type === "event_sale" && (
+                      <Text style={styles.soldHint}>
+                        Pon cuánto vendiste de cada uno — solo eso se descuenta
+                        de tu stock.
+                      </Text>
+                    )}
                     {items.map((item, i) => (
                       <View key={i} style={styles.itemRow}>
                         {item.image ? (
@@ -597,6 +628,19 @@ export function NewActivityScreen() {
                           </TouchableOpacity>
                         </View>
 
+                        {type === "event_sale" && (
+                          <View style={styles.soldWrap}>
+                            <Text style={styles.soldLabel}>vendí</Text>
+                            <TextInput
+                              style={styles.soldInput}
+                              keyboardType="number-pad"
+                              value={String(item.qtySold ?? item.qty)}
+                              onChangeText={(v) => setSoldDirect(i, v)}
+                              selectTextOnFocus
+                            />
+                          </View>
+                        )}
+
                         {!item.productId && (
                           <TextInput
                             style={styles.itemPriceInput}
@@ -611,7 +655,7 @@ export function NewActivityScreen() {
                         )}
 
                         <Text style={styles.itemSubtotal}>
-                          {formatCurrency(item.qty * item.unitPrice)}
+                          {formatCurrency(soldQtyOf(item) * item.unitPrice)}
                         </Text>
                         <TouchableOpacity
                           onPress={() => removeItem(i)}
@@ -626,7 +670,9 @@ export function NewActivityScreen() {
                       </View>
                     ))}
                     <View style={styles.totalRow}>
-                      <Text style={styles.totalLabel}>Total</Text>
+                      <Text style={styles.totalLabel}>
+                        {type === "event_sale" ? "Total vendido" : "Total"}
+                      </Text>
                       <Text style={styles.totalValue}>
                         {formatCurrency(orderTotal)}
                       </Text>
@@ -837,6 +883,32 @@ const styles = StyleSheet.create({
     borderColor: bold.black,
   },
   qtyStepper: { flexDirection: "row", alignItems: "center", gap: 6 },
+  soldWrap: { alignItems: "center", gap: 1 },
+  soldLabel: {
+    fontSize: 8.5,
+    fontWeight: "700",
+    color: bold.textMuted,
+    textTransform: "uppercase",
+  },
+  soldInput: {
+    width: 42,
+    fontSize: 12.5,
+    fontWeight: "700",
+    color: bold.pinkDark,
+    backgroundColor: bold.pinkLight,
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 5,
+    borderWidth: 1.5,
+    borderColor: bold.black,
+    textAlign: "center",
+  },
+  soldHint: {
+    fontSize: 11.5,
+    color: bold.textSecondary,
+    marginBottom: 8,
+    lineHeight: 15,
+  },
   qtyBtn: {
     width: 22,
     height: 22,
