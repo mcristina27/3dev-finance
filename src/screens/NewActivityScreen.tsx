@@ -30,6 +30,7 @@ import {
 } from "lucide-react-native";
 import { useActivities } from "../context/ActivityContext";
 import { useAgendaEvents } from "../context/AgendaEventContext";
+import { NumberInput } from "../components/NumberInput";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
 import { DateField } from "../components/DateField";
 import { ModalHeader } from "../components/ModalHeader";
@@ -196,21 +197,19 @@ export function NewActivityScreen() {
     });
   }
 
-  function setQtyDirect(index: number, value: string) {
-    const parsed = parseInt(value.replace(/[^0-9]/g, ""), 10);
+  function setQtyValue(index: number, n: number) {
     setItems((prev) => {
       const next = [...prev];
-      next[index] = { ...next[index], qty: isNaN(parsed) ? 0 : parsed };
+      next[index] = { ...next[index], qty: n };
       return next;
     });
   }
 
   // Venta de evento: cuántas unidades se vendieron realmente de este ítem.
-  function setSoldDirect(index: number, value: string) {
-    const parsed = parseInt(value.replace(/[^0-9]/g, ""), 10);
+  function setSoldValue(index: number, n: number) {
     setItems((prev) => {
       const next = [...prev];
-      next[index] = { ...next[index], qtySold: isNaN(parsed) ? 0 : parsed };
+      next[index] = { ...next[index], qtySold: n };
       return next;
     });
   }
@@ -609,11 +608,10 @@ export function NewActivityScreen() {
                               strokeWidth={2.5}
                             />
                           </TouchableOpacity>
-                          <TextInput
+                          <NumberInput
                             style={styles.qtyInput}
-                            keyboardType="number-pad"
-                            value={String(item.qty)}
-                            onChangeText={(v) => setQtyDirect(i, v)}
+                            value={item.qty}
+                            onChangeValue={(n) => setQtyValue(i, n)}
                             selectTextOnFocus
                           />
                           <TouchableOpacity
@@ -631,11 +629,10 @@ export function NewActivityScreen() {
                         {type === "event_sale" && (
                           <View style={styles.soldWrap}>
                             <Text style={styles.soldLabel}>vendí</Text>
-                            <TextInput
+                            <NumberInput
                               style={styles.soldInput}
-                              keyboardType="number-pad"
-                              value={String(item.qtySold ?? item.qty)}
-                              onChangeText={(v) => setSoldDirect(i, v)}
+                              value={item.qtySold ?? item.qty}
+                              onChangeValue={(n) => setSoldValue(i, n)}
                               selectTextOnFocus
                             />
                           </View>
