@@ -90,9 +90,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("No se pudo iniciar sesión con Google");
     }
 
-    const url = new URL(result.url);
-    const raw = url.hash ? url.hash.slice(1) : url.search.slice(1);
-    const params = new URLSearchParams(raw);
+    // Supabase (flujo implícito) devuelve los tokens en el fragment #... (o,
+    // por si acaso, en el query ?...). Los extraemos a mano para no depender
+    // del parseo de URL con esquemas personalizados como 3devfinance://.
+    const returned = result.url;
+    const frag = returned.includes("#")
+      ? returned.slice(returned.indexOf("#") + 1)
+      : returned.includes("?")
+        ? returned.slice(returned.indexOf("?") + 1)
+        : "";
+    const params = new URLSearchParams(frag);
     const access_token = params.get("access_token");
     const refresh_token = params.get("refresh_token");
     if (!access_token || !refresh_token) {

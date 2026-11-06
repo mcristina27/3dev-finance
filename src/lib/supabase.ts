@@ -18,6 +18,10 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // Flujo implícito: Supabase devuelve los tokens en el fragment (#...) de
+    // la URL de retorno, que leemos en AuthContext. Evita el "flow state" de
+    // PKCE (que daba 500 "Error creating flow state" en el OAuth de Google).
+    flowType: "implicit",
   },
 });
 
