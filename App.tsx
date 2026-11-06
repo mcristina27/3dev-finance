@@ -9,6 +9,7 @@ import { MaterialProvider } from './src/context/MaterialContext';
 import { ActivityProvider } from './src/context/ActivityContext';
 import { InventoryProvider } from './src/context/InventoryContext';
 import { AgendaEventProvider } from './src/context/AgendaEventContext';
+import { RecipeProvider } from './src/context/RecipeContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { migrateStorageKeys } from './src/services/migrateStorageKeys';
 import { bold } from './src/theme/boldTheme';
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <ConnectivityProvider>
       <AuthProvider>
+      <RecipeProvider>
       <TransactionProvider>
         <MaterialProvider>
           <InventoryProvider>
@@ -43,6 +45,7 @@ export default function App() {
           </InventoryProvider>
         </MaterialProvider>
       </TransactionProvider>
+      </RecipeProvider>
       </AuthProvider>
     </ConnectivityProvider>
   );

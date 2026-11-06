@@ -16,6 +16,7 @@ import { NewActivityScreen } from '../screens/NewActivityScreen';
 import { NewAgendaEventScreen } from '../screens/NewAgendaEventScreen';
 import { AdjustStockScreen } from '../screens/AdjustStockScreen';
 import { BackupScreen } from '../screens/BackupScreen';
+import { RecipeScreen } from '../screens/RecipeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { useAuth } from '../context/AuthContext';
 import { bold, hardShadow } from '../theme/boldTheme';
@@ -145,6 +146,11 @@ function MainNavigator() {
       <Stack.Screen
         name="AjustarStock"
         component={AdjustStockScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="Receta"
+        component={RecipeScreen}
         options={{ presentation: 'modal' }}
       />
     </Stack.Navigator>

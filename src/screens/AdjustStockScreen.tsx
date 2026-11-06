@@ -22,6 +22,7 @@ import {
   Plus,
   Minus,
   RefreshCw,
+  ChefHat,
 } from "lucide-react-native";
 import { useInventory } from "../context/InventoryContext";
 import { getCatalog, forceRefreshCatalog } from "../services/catalogService";
@@ -35,7 +36,7 @@ import { CatalogProduct } from "../types";
 type Mode = "add" | "set";
 
 export function AdjustStockScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const presetProductId = route.params?.productId as string | undefined;
 
@@ -256,6 +257,23 @@ export function AdjustStockScreen() {
                     )}
                   </View>
 
+                  <TouchableOpacity
+                    style={styles.recipeBtn}
+                    onPress={() =>
+                      navigation.navigate("Receta", {
+                        productId: String(selected.id),
+                        productName: selected.name,
+                        productPrice: selected.price ?? null,
+                      })
+                    }
+                    activeOpacity={0.85}
+                  >
+                    <ChefHat size={16} color={bold.pink} strokeWidth={2.4} />
+                    <Text style={styles.recipeBtnText}>
+                      Receta y costo del producto
+                    </Text>
+                  </TouchableOpacity>
+
                   {(() => {
                     const lastUpdated = getLastUpdated(String(selected.id));
                     const historyEntries = getHistory(String(selected.id)).slice(
@@ -415,6 +433,19 @@ export function AdjustStockScreen() {
 }
 
 const styles = StyleSheet.create({
+  recipeBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: bold.pink,
+    backgroundColor: bold.pinkLight,
+  },
+  recipeBtnText: { fontSize: 13.5, fontWeight: "800", color: bold.pinkDark },
   root: {
     flex: 1,
     backgroundColor: bold.bg,
