@@ -67,15 +67,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Google: Supabase arma la URL de autorización (usa el Client ID/Secret
   // configurados en Supabase > Authentication > Providers > Google, la app
   // no necesita saber cuáles son), la abrimos en el navegador del sistema y
-  // Supabase nos regresa a la app por el esquema "3devfinance://" con la
+  // Supabase nos regresa a la app por el esquema "devfinance://" con la
   // sesión ya lista — no hace falta ningún client id en el .env.
   async function signInWithGoogle() {
     const WebBrowser = await import("expo-web-browser");
 
-    // Path explícito ("auth-callback") para que calce con el patrón
-    // "3devfinance://**" de la allow-list de Supabase. Un esquema a secas
-    // ("3devfinance://") no calza y Supabase cae a su Site URL (localhost).
-    const redirectTo = "3devfinance://auth-callback";
+    // El esquema DEBE empezar con letra (devfinance, no 3devfinance): el
+    // parser de URL de Supabase (Go) rechaza esquemas que empiezan con dígito,
+    // los descarta como redirect inválido y cae a su Site URL (localhost).
+    const redirectTo = "devfinance://auth-callback";
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Supabase (flujo implícito) devuelve los tokens en el fragment #... (o,
     // por si acaso, en el query ?...). Los extraemos a mano para no depender
-    // del parseo de URL con esquemas personalizados como 3devfinance://.
+    // del parseo de URL con esquemas personalizados como devfinance://.
     const returned = result.url;
     const frag = returned.includes("#")
       ? returned.slice(returned.indexOf("#") + 1)

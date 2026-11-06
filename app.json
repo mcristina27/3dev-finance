@@ -28,6 +28,6 @@
       "expo-font",
       "expo-apple-authentication"
     ],
-    "scheme": "3devfinance"
+    "scheme": "devfinance"
   }
 }
