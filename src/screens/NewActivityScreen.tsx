@@ -197,19 +197,31 @@ export function NewActivityScreen() {
     });
   }
 
-  function setQtyValue(index: number, n: number) {
+  function setQtyDirect(index: number, value: string) {
+    const parsed = parseInt(value.replace(/[^0-9]/g, ""), 10);
     setItems((prev) => {
       const next = [...prev];
-      next[index] = { ...next[index], qty: n };
+      next[index] = { ...next[index], qty: isNaN(parsed) ? 0 : parsed };
+      return next;
+    });
+  }
+
+  // Precio unitario por producto, con decimales (es dinero). Editable incluso
+  // para productos del catálogo, p.ej. un pedido especial a otro precio.
+  function setPrice(index: number, n: number) {
+    setItems((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], unitPrice: n };
       return next;
     });
   }
 
   // Venta de evento: cuántas unidades se vendieron realmente de este ítem.
-  function setSoldValue(index: number, n: number) {
+  function setSoldDirect(index: number, value: string) {
+    const parsed = parseInt(value.replace(/[^0-9]/g, ""), 10);
     setItems((prev) => {
       const next = [...prev];
-      next[index] = { ...next[index], qtySold: n };
+      next[index] = { ...next[index], qtySold: isNaN(parsed) ? 0 : parsed };
       return next;
     });
   }
@@ -608,10 +620,11 @@ export function NewActivityScreen() {
                               strokeWidth={2.5}
                             />
                           </TouchableOpacity>
-                          <NumberInput
+                          <TextInput
                             style={styles.qtyInput}
-                            value={item.qty}
-                            onChangeValue={(n) => setQtyValue(i, n)}
+                            keyboardType="number-pad"
+                            value={String(item.qty)}
+                            onChangeText={(v) => setQtyDirect(i, v)}
                             selectTextOnFocus
                           />
                           <TouchableOpacity
@@ -629,27 +642,24 @@ export function NewActivityScreen() {
                         {type === "event_sale" && (
                           <View style={styles.soldWrap}>
                             <Text style={styles.soldLabel}>vendí</Text>
-                            <NumberInput
+                            <TextInput
                               style={styles.soldInput}
-                              value={item.qtySold ?? item.qty}
-                              onChangeValue={(n) => setSoldValue(i, n)}
+                              keyboardType="number-pad"
+                              value={String(item.qtySold ?? item.qty)}
+                              onChangeText={(v) => setSoldDirect(i, v)}
                               selectTextOnFocus
                             />
                           </View>
                         )}
 
-                        {!item.productId && (
-                          <TextInput
-                            style={styles.itemPriceInput}
-                            placeholder="0.00"
-                            placeholderTextColor={bold.textMuted}
-                            keyboardType="decimal-pad"
-                            value={item.unitPrice ? String(item.unitPrice) : ""}
-                            onChangeText={(v) =>
-                              updateCustomItem(i, "unitPrice", v)
-                            }
-                          />
-                        )}
+                        <NumberInput
+                          style={styles.itemPriceInput}
+                          placeholder="0.00"
+                          placeholderTextColor={bold.textMuted}
+                          value={item.unitPrice}
+                          onChangeValue={(n) => setPrice(i, n)}
+                          selectTextOnFocus
+                        />
 
                         <Text style={styles.itemSubtotal}>
                           {formatCurrency(soldQtyOf(item) * item.unitPrice)}
